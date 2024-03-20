@@ -1,0 +1,21 @@
+[project]
+name = "yfiles_jupyter_graphs_for_neo4j"
+version = "1.0.0-beta"
+authors = [
+  {name = "yWorks Support Team", email= "yfileshtml@yworks.com"},
+]
+description = "Neo4j graph visualization using yfiles jupyter graph widget"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: SEE LICENSE IN LICENSE.md",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  "yfiles_jupyter_graphs", "neo4j"
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
