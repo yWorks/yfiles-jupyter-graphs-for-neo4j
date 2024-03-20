@@ -13,7 +13,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-  "yfiles_jupyter_graphs", "neo4j"
+  "yfiles_jupyter_graphs"
 ]
 
 [build-system]
