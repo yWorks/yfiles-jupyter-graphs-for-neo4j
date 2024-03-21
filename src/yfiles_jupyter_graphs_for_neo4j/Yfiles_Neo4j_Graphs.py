@@ -6,8 +6,10 @@ The main YfilesNeo4jGraphs class is defined in this module.
 from yfiles_jupyter_graphs import GraphWidget
 from typing import Optional, Any
 
-POSSIBLE_BINDINGS = {'color', 'label'}
+#TODO maybe change to get dynamically when adding bindings
 
+POSSIBLE_NODE_BINDINGS = {'color', 'size', 'label'}
+POSSIBLE_EDGE_BINDINGS = {'color', 'thickness_factor', 'label'}
 class YfilesNeo4jGraphs:
     _driver = None
     _node_configurations = {}
@@ -53,7 +55,7 @@ class YfilesNeo4jGraphs:
 
     def apply_node_mappings(self, widget):
 
-        for key in POSSIBLE_BINDINGS:
+        for key in POSSIBLE_NODE_BINDINGS:
             def wrapper(key):
                 def mapping(index, node):
                     label = node["properties"]["label"]
@@ -71,7 +73,7 @@ class YfilesNeo4jGraphs:
 
     def apply_edge_mappings(self, widget):
 
-        for key in POSSIBLE_BINDINGS:
+        for key in POSSIBLE_EDGE_BINDINGS:
             def wrapper(key):
                 def mapping(index, edge):
                     label = edge["properties"]["label"]
@@ -87,11 +89,11 @@ class YfilesNeo4jGraphs:
 
             setattr(widget, f"_edge_{key}_mapping", wrapper(key))
 
-    def add_node_configuration(self, type, textbinding='label', color=None):
-        config = {'label': textbinding, 'color': color}
+    def add_node_configuration(self, type, textbinding='label', color=None, size=None):
+        config = {'label': textbinding, 'color': color, 'size': size}
         self._node_configurations[type] = {key: value for key, value in config.items() if value is not None}
 
 
-    def add_relation_configuration(self, type, textbinding='label', color=None):
-        config = {'label': textbinding, 'color': color}
+    def add_relation_configuration(self, type, textbinding='label', color=None, thickness=None):
+        config = {'label': textbinding, 'color': color, 'thickness_factor': thickness}
         self._edge_configurations[type] = {key: value for key, value in config.items() if value is not None}
