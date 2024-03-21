@@ -97,3 +97,12 @@ class YfilesNeo4jGraphs:
     def add_relation_configuration(self, type, textbinding='label', color=None, thickness=None):
         config = {'label': textbinding, 'color': color, 'thickness_factor': thickness}
         self._edge_configurations[type] = {key: value for key, value in config.items() if value is not None}
+
+
+    def del_node_configuration(self, type):
+        if type in self._node_configurations:
+            del self._node_configurations[type]
+
+    def del_edge_configuration(self, type):
+        if type in self._edge_configurations:
+            del self._edge_configurations[type]
