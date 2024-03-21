@@ -1,5 +1,5 @@
 dist
 node_modules
-.eggs
 .ipynb_checkpoints
 .idea
+/src/yfiles_jupyter_graphs_for_neo4j.egg-info/

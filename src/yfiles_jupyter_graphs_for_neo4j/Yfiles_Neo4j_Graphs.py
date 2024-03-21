@@ -6,6 +6,8 @@ The main YfilesNeo4jGraphs class is defined in this module.
 from yfiles_jupyter_graphs import GraphWidget
 from typing import Optional, Any
 
+POSSIBLE_BINDINGS = {'color', 'label'}
+
 class YfilesNeo4jGraphs:
     _driver = None
     _node_configurations = {}
@@ -42,29 +44,54 @@ class YfilesNeo4jGraphs:
         """
         if self._driver is not None:
             widget = GraphWidget(graph=self._session.run(cypher, **kwargs).graph())
-            widget.set_node_styles_mapping(lambda node: self._node_configurations.get(node["properties"]["label"], {}))
-            widget.set_node_label_mapping(lambda node: node["properties"][
-                self._node_configurations.get(node["properties"]["label"], {"label": "label"})["label"]])
+            self.apply_node_mappings(widget)
+            self.apply_edge_mappings(widget)
 
             widget.show()
         else:
             raise Exception("no driver specified")
 
+    def apply_node_mappings(self, widget):
 
-    #TODO add more bindings
-    def add_node_configuration(self, type, textbinding=None, color=None):
-        if textbinding is not None and color is not None:
-            self._node_configurations[type] = {'label': textbinding, 'color': color}
-        elif textbinding is None and color is not None:
-            self._node_configurations[type] = {'color': color}
-        elif textbinding is not None and color is None:
-            self._node_configurations[type] = {'label': textbinding}
+        for key in POSSIBLE_BINDINGS:
+            def wrapper(key):
+                def mapping(index, node):
+                    label = node["properties"]["label"]
+                    if label in self._node_configurations and key in self._node_configurations.get(label):
+                        if self._node_configurations.get(label)[key] in node["properties"]:
+                            return node["properties"][self._node_configurations.get(label).get(key)]
+                        else:
+                            return self._node_configurations.get(label).get(key)
+                    default = getattr(widget, f"default_node_{key}_mapping")
+                    return default(index, node)
+                return mapping
+
+            setattr(widget, f"_node_{key}_mapping", wrapper(key))
 
 
-    def add_relation_configuration(self, type, textbinding=None, color=None):
-        if textbinding is not None and color is not None:
-            self._edge_configurations[type] = {'label': textbinding, 'color': color}
-        elif textbinding is None and color is not None:
-            self._edge_configurations[type] = {'color': color}
-        elif textbinding is not None and color is None:
-            self._edge_configurations[type] = {'label': textbinding}
+    def apply_edge_mappings(self, widget):
+
+        for key in POSSIBLE_BINDINGS:
+            def wrapper(key):
+                def mapping(index, edge):
+                    label = edge["properties"]["label"]
+                    if label in self._edge_configurations and key in self._edge_configurations.get(label):
+                        if self._edge_configurations.get(label)[key] in edge["properties"]:
+                            return edge["properties"][self._edge_configurations.get(label).get(key)]
+                        else:
+                            return self._edge_configurations.get(label).get(key)
+                    default = getattr(widget, f"default_edge_{key}_mapping")
+                    return default(index, edge)
+
+                return mapping
+
+            setattr(widget, f"_edge_{key}_mapping", wrapper(key))
+
+    def add_node_configuration(self, type, textbinding='label', color=None):
+        config = {'label': textbinding, 'color': color}
+        self._node_configurations[type] = {key: value for key, value in config.items() if value is not None}
+
+
+    def add_relation_configuration(self, type, textbinding='label', color=None):
+        config = {'label': textbinding, 'color': color}
+        self._edge_configurations[type] = {key: value for key, value in config.items() if value is not None}
