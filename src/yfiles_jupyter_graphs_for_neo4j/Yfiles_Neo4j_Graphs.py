@@ -78,8 +78,13 @@ class YfilesNeo4jGraphs:
                 def mapping(index, edge):
                     label = edge["properties"]["label"]
                     if label in self._edge_configurations and key in self._edge_configurations.get(label):
-                        if self._edge_configurations.get(label)[key] in edge["properties"]:
+                        # mapping
+                        if callable(self._edge_configurations.get(label)[key]):
+                            return self._edge_configurations.get(label)[key](edge)
+                        # property name
+                        elif self._edge_configurations.get(label)[key] in edge["properties"]:
                             return edge["properties"][self._edge_configurations.get(label).get(key)]
+                        #value
                         else:
                             return self._edge_configurations.get(label).get(key)
                     default = getattr(widget, f"default_edge_{key}_mapping")
