@@ -48,6 +48,7 @@ class YfilesNeo4jGraphs:
             self.apply_node_mappings(widget)
             self.apply_edge_mappings(widget)
 
+            self._widget = widget
             widget.show()
         else:
             raise Exception("no driver specified")
@@ -113,3 +114,13 @@ class YfilesNeo4jGraphs:
     def del_edge_configuration(self, type):
         if type in self._edge_configurations:
             del self._edge_configurations[type]
+
+    def get_selected_node_ids(self, widget=None):
+        graph = widget if widget is not None else self._widget
+        nodes, edges = graph.get_selection()
+        return list(map(lambda node: node['id'], nodes))
+
+    def get_selected_edge_ids(self, widget=None):
+        graph = widget if widget is not None else self._widget
+        nodes, edges = graph.get_selection()
+        return list(map(lambda edge: edge['id'], edges))
