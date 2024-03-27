@@ -4,21 +4,28 @@ The main YfilesNeo4jGraphs class is defined in this module.
 
 """
 from yfiles_jupyter_graphs import GraphWidget
-from typing import Optional, Any
 
 # TODO maybe change to get dynamically when adding bindings
 
-POSSIBLE_NODE_BINDINGS = {'color', 'size', 'label'}
+POSSIBLE_NODE_BINDINGS = {'color', 'size', 'label', 'type', 'style'}
 POSSIBLE_EDGE_BINDINGS = {'color', 'thickness_factor', 'label'}
+
+
 class YfilesNeo4jGraphs:
     _driver = None
     _node_configurations = {}
     _edge_configurations = {}
+    _widget = GraphWidget()
 
-    def __init__(self, driver: Optional[Any] = None):
+    def __init__(self, driver=None, widget_layout=None,
+                 overview_enabled=None, context_start_with=None, license=None):
         if driver is not None:
             self._driver = driver
             self._session = driver.session()
+            self._license = license
+            self._overview = overview_enabled
+            self._layout = widget_layout
+            self._context_start_with = context_start_with
 
     def set_driver(self, driver):
         """
@@ -44,7 +51,9 @@ class YfilesNeo4jGraphs:
                **kwargs: variable declarations usable in cypher
         """
         if self._driver is not None:
-            widget = GraphWidget(graph=self._session.run(cypher, **kwargs).graph())
+            widget = GraphWidget(overview_enabled=self._overview, context_start_with=self._context_start_with,
+                                 widget_layout=self._layout, license=self._license,
+                                 graph=self._session.run(cypher, **kwargs).graph())
             self.apply_node_mappings(widget)
             self.apply_edge_mappings(widget)
 
@@ -99,19 +108,19 @@ class YfilesNeo4jGraphs:
 
             setattr(widget, f"_edge_{key}_mapping", wrapper(key))
 
-    def add_node_configuration(self, type, textbinding='label', color=None, size=None):
-        config = {'label': textbinding, 'color': color, 'size': size}
-        self._node_configurations[type] = {key: value for key, value in config.items() if value is not None}
+    def add_node_configuration(self, type, text='label', **kwargs):
+        config = {'label': text, **kwargs}
+        self._node_configurations[type] = {key: value for key, value in config.items()}
 
-    def add_relation_configuration(self, type, textbinding='label', color=None, thickness=None):
-        config = {'label': textbinding, 'color': color, 'thickness_factor': thickness}
-        self._edge_configurations[type] = {key: value for key, value in config.items() if value is not None}
+    def add_relationship_configuration(self, type, text='label', **kwargs):
+        config = {'label': text, **kwargs}
+        self._edge_configurations[type] = {key: value for key, value in config.items()}
 
     def del_node_configuration(self, type):
         if type in self._node_configurations:
             del self._node_configurations[type]
 
-    def del_edge_configuration(self, type):
+    def del_relationship_configuration(self, type):
         if type in self._edge_configurations:
             del self._edge_configurations[type]
 
