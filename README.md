@@ -1,7 +1,7 @@
 # yfiles_jupyter_graphs_for_neo4j
 ![A screenshot showing the yFiles graph widget for neo4j in a jupyter lab notebook](https://raw.githubusercontent.com/yWorks/yfiles-jupyter-graphs-for-neo4j/main/images/example.png)
 
-Use yfiles_jupyter_graphs_for_neo4j to directly visualize neo4j graphs with the yfiles_jupyter_graphs
+Use yfiles_jupyter_graphs_for_neo4j to directly visualize [Neo4j](https://neo4j.com/) graphs with the yfiles_jupyter_graphs
 widget. 
 
 ## Installation
@@ -36,7 +36,7 @@ Everything is in the one main class ```YfilesNeo4jGraphs```:
 - ```show_cypher(cypher, **kwargs)```
     - ```cypher```
       
-        the cypher query used for the graph
+        the [cypher query](https://neo4j.com/docs/cypher-manual/current/introduction/) used for the graph
     - ```**kwargs```
   
         any additional key word arguments (like parameters used in the cypher) are being directly passed onto the cypher
