@@ -1,4 +1,5 @@
 # yfiles_jupyter_graphs_for_neo4j
+![A screenshot showing the yFiles graph widget for neo4j in a jupyter lab notebook](https://raw.githubusercontent.com/yWorks/yfiles-jupyter-graphs-for.neo4j/images/example.png)
 
 Use yfiles_jupyter_graphs_for_neo4j to directly visualize neo4j graphs with the yfiles_jupyter_graphs
 widget. 
