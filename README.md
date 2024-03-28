@@ -41,6 +41,14 @@ Everything is in the one main class ```YfilesNeo4jGraphs```:
   
         any additional key word arguments (like parameters used in the cypher) are being directly passed onto the cypher
 
+To show any graph, you need to have a driver. If you have not specified a driver when initiating the class, you can set a driver afterwards:
+
+- ```set_driver(driver)```
+    - ```driver```
+        sets the given driver and uses this to send cypher queries to Databases
+- ```get_driver()```
+    Returns the current driver
+
 
 The graph can be adjusted by adding configurations to each type with the following two functions:
 
