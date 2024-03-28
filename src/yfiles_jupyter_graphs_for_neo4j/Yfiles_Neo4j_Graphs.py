@@ -21,11 +21,11 @@ class YfilesNeo4jGraphs:
                  overview_enabled=None, context_start_with=None, license=None):
         if driver is not None:
             self._driver = driver
-            self._session = driver.session()
-            self._license = license
-            self._overview = overview_enabled
-            self._layout = widget_layout
-            self._context_start_with = context_start_with
+        self._session = driver.session()
+        self._license = license
+        self._overview = overview_enabled
+        self._layout = widget_layout
+        self._context_start_with = context_start_with
 
     def set_driver(self, driver):
         """
