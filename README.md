@@ -63,7 +63,8 @@ The graph can be adjusted by adding configurations to each type with the followi
   
     - ```**kwargs``` 
         
-        configurations are added here as keyword arguments. Possible keywords are ```size```, ```color```, ```style``` and ```type```
+        configurations are added here as keyword arguments. Possible keywords are ```size```, ```color```,
+         ```style```, ```property```, ```position```, ```layout```, ```scale_factor```, and ```type```
         
         The ```type``` keyword argument is referencing the yfiles_jupyter_graph type not the neo4j type.
 
@@ -81,7 +82,7 @@ The graph can be adjusted by adding configurations to each type with the followi
   
     - ```**kwargs``` 
         
-        configurations are added here as keyword arguments. Possible keywords are ```color``` and ```thickness_factor```
+        configurations are added here as keyword arguments. Possible keywords are ```color```, ```property``` and ```thickness_factor```
 
 To remove a configuration use the following two functions: 
 
@@ -110,3 +111,5 @@ You can select nodes and edges and get their ids. You can use the returned ids f
     
     Returns an Array of edge ids
         
+
+To learn more about the jupyter widget check out its [GitHub](https://github.com/yWorks/yfiles-jupyter-graphs) page
