@@ -1,0 +1,6 @@
+name: yfiles_jupyter_graphs_for_neo4j_build
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - build

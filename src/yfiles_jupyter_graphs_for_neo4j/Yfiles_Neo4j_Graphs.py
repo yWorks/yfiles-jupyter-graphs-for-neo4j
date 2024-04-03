@@ -108,9 +108,9 @@ class YfilesNeo4jGraphs:
 
             setattr(widget, f"_edge_{key}_mapping", wrapper(key))
 
-    def add_node_configuration(self, type, text='label', **kwargs):
+    def add_node_configuration(self, label, text='label', **kwargs):
         config = {'label': text, **kwargs}
-        self._node_configurations[type] = {key: value for key, value in config.items()}
+        self._node_configurations[label] = {key: value for key, value in config.items()}
 
     def add_relationship_configuration(self, type, text='label', **kwargs):
         config = {'label': text, **kwargs}
@@ -129,7 +129,7 @@ class YfilesNeo4jGraphs:
         nodes, edges = graph.get_selection()
         return list(map(lambda node: node['id'], nodes))
 
-    def get_selected_edge_ids(self, widget=None):
+    def get_selected_relationship_ids(self, widget=None):
         graph = widget if widget is not None else self._widget
         nodes, edges = graph.get_selection()
         return list(map(lambda edge: edge['id'], edges))

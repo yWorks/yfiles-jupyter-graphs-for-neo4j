@@ -4,17 +4,32 @@ version = "1.0.0-beta"
 authors = [
   {name = "yWorks Support Team", email= "yfileshtml@yworks.com"},
 ]
-description = "Neo4j graph visualization using yfiles jupyter graph widget"
+description = "A Neo4j graph visualization package that uses the yfiles-jupyter-graphs widget"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: IPython",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
     "Programming Language :: Python :: 3",
-    "License :: SEE LICENSE IN LICENSE.md",
     "Operating System :: OS Independent",
+    "Framework :: Jupyter",
+    "Framework :: Jupyter :: JupyterLab",
+    "Framework :: Jupyter :: JupyterLab :: 3",
+    "Framework :: Jupyter :: JupyterLab :: Extensions",
+    "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
 ]
+license = {file = "LICENSE.md"}
 dependencies = [
   "yfiles_jupyter_graphs"
 ]
+
+[project.urls]
+License = "https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/LICENSE.md"
+"Bug Tracker" = "https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/issues"
+Documentation = "https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/"
+Repository = "https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j.git"
 
 [build-system]
 requires = ["setuptools>=61.0"]
