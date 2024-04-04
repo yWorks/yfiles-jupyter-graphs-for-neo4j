@@ -29,7 +29,9 @@ jobs:
     steps:
     - uses: actions/upload-artifact@v4
       with:
-        path: dist/*
+        path: |
+          '**/*.tar.gz'
+          '**/*.whl'
         overwrite: true
   
   download:
