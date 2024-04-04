@@ -18,7 +18,7 @@ class YfilesNeo4jGraphs:
     _widget = GraphWidget()
 
     def __init__(self, driver=None, widget_layout=None,
-                 overview_enabled=None, context_start_with=None, license=None):
+                 overview_enabled=None, context_start_with='About', license=None):
         if driver is not None:
             self._driver = driver
         self._session = driver.session()
