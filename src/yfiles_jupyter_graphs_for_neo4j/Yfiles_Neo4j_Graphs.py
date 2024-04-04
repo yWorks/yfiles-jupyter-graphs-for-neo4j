@@ -7,7 +7,7 @@ from yfiles_jupyter_graphs import GraphWidget
 
 # TODO maybe change to get dynamically when adding bindings
 
-POSSIBLE_NODE_BINDINGS = {'color', 'size', 'type', 'style', 'scale_factor', 'position', 'layout', 'property', 'label'}
+POSSIBLE_NODE_BINDINGS = {'color', 'size', 'type', 'styles', 'scale_factor', 'position', 'layout', 'property', 'label'}
 POSSIBLE_EDGE_BINDINGS = {'color', 'thickness_factor', 'property', 'label'}
 
 
