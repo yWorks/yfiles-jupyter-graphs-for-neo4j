@@ -73,21 +73,26 @@ a driver afterward:
 The graph visualization can be adjusted by adding configurations to each node label or edge type with the following
 functions:
 
-- `add_node_configuration(label, text='label', **kwargs)`
+- `add_node_configuration(label, **kwargs)`
     - `label`: The node label for which this configuration should be used.
-    - `text`: The property that should be used as text on the item in the graph. By default, the node's label is used.
-    - `**kwargs`: Configurations are added as keyword arguments. Possible keywords are `size`, `color`,
-      `style`, `property`, `position`, `layout`, `scale_factor`, and `type`.
-      Note that the `type` keyword argument is referring to the item type used
-      in [yFiles Graphs for Jupyter](https://yworks.github.io/yfiles-jupyter-graphs/02_graph_widget/#def-default_node_type_mappingindex-node)
-      which affects how automatic layouts arrange the nodes.
+    - `**kwargs`: Visualization configuration for the given node label. The following arguments are supported:
+        - `text`: The text that displayed at the node. By default, the node's label is used.
+        - `color`: A convenience color binding for the node (see also `styles` argument).
+        - `size`: The size of the node.
+        - `styles`: A dictionary that may contain the following attributes `color`, `shape` (one of 'ellipse', '
+          hexagon', 'hexagon2', 'octagon', 'pill', 'rectangle', 'round-rectangle' or 'triangle'), `image`.
+        - `property`: Allows to specify additional properties on the node, which may be bound by other bindings.
+        - `type`: Defines a specific "type" for the node as described
+          in [yFiles Graphs for Jupyter](https://yworks.github.io/yfiles-jupyter-graphs/02_graph_widget/#def-default_node_type_mappingindex-node)
+          which affects the automatic positioning of nodes (same "type"s are preferred to be placed next to each other).
 
-- `add_relationship_configuration(type, text='label', **kwargs)`
+- `add_relationship_configuration(type, **kwargs)`
     - `type`: The edge type for which this configuration should be used.
-    - `text`: The property that should be used as text on the item in the graph. By default, the relationship's type is
-      used.
-    - `**kwargs`: Configurations are added here as keyword arguments. Possible keywords are `color`, `property`
-      and `thickness_factor`.
+    - `**kwargs`: Visualization configuration for the given relationship type. The following arguments are supported:
+        - `text`: The text that displayed at the relationship. By default, the relationship's type is used.
+        - `color`: The relationship's color.
+        - `thickness_factor`: The relationship's stroke thickness factor. By default, `1`.
+        - `property`: Allows to specify additional properties on the relationship, which may be bound by other bindings.
 
 To remove a configuration use the following functions: 
 
@@ -103,8 +108,22 @@ the [selection example](https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4
       used.
     
 - `get_selected_relationship_ids(widget=None)`: Returns an Array of relationship ids
-    - `widget`: The widget that is used to select edges from.. If `None` is specified, the most recently shown widget is
+    - `widget`: The widget that is used to select edges from. If `None` is specified, the most recently shown widget is
       used.
+
+## How configuration bindings are resolved
+
+The configuration bindings (see `add_node_configuration` or `add_relationship_configuration`) are resolved as follows:
+
+If the configuration binding is a string, the package first tries to resolve it against the item's properties
+and uses the property value if available. If there is no property with the given key, the string value itself is used as
+a constant binding.
+
+In case you want to create a constant string value as binding, which also happens to be a property key, use a binding
+function with a constant string as return value instead.
+
+If the configuration binding is a function, the return value of the function is used as value for the respective
+configuration.
 
 ## yFiles Graphs for Jupyter
 

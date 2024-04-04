@@ -108,12 +108,22 @@ class YfilesNeo4jGraphs:
 
             setattr(widget, f"_edge_{key}_mapping", wrapper(key))
 
-    def add_node_configuration(self, label, text='label', **kwargs):
-        config = {'label': text, **kwargs}
+    def add_node_configuration(self, label, **kwargs):
+        # this wrapper uses "text" as text binding in the graph
+        # in contrast to "label" which is used in yfiles-jupyter-graphs
+        text_binding = kwargs.pop("text", 'label')
+        config = kwargs
+        if text_binding is not None:
+            config["label"] = text_binding
         self._node_configurations[label] = {key: value for key, value in config.items()}
 
-    def add_relationship_configuration(self, type, text='label', **kwargs):
-        config = {'label': text, **kwargs}
+    def add_relationship_configuration(self, type, **kwargs):
+        # this wrapper uses "text" as text binding in the graph
+        # in contrast to "label" which is used in yfiles-jupyter-graphs
+        text_binding = kwargs.pop("text", 'label')
+        config = kwargs
+        if text_binding is not None:
+            config["label"] = text_binding
         self._edge_configurations[type] = {key: value for key, value in config.items()}
 
     def del_node_configuration(self, type):
