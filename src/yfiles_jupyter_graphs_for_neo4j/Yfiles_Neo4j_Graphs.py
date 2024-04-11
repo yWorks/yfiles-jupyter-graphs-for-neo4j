@@ -11,7 +11,7 @@ POSSIBLE_NODE_BINDINGS = {'color', 'size', 'type', 'styles', 'scale_factor', 'po
 POSSIBLE_EDGE_BINDINGS = {'color', 'thickness_factor', 'property', 'label'}
 
 
-class YfilesNeo4jGraphs:
+class Neo4jGraphWidget:
     _driver = None
     _node_configurations = {}
     _edge_configurations = {}
