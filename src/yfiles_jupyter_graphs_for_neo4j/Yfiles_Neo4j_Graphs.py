@@ -1,6 +1,6 @@
 """Jupyter (ipy)widget powered by yFiles.
 
-The main YfilesNeo4jGraphs class is defined in this module.
+The main Neo4jGraphWidget class is defined in this module.
 
 """
 from yfiles_jupyter_graphs import GraphWidget

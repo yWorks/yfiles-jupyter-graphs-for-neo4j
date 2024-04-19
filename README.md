@@ -1,4 +1,4 @@
-# yfiles_jupyter_graphs_for_neo4j
+# yFiles Jupyter Graphs for Neo4j
 ![A screenshot showing the yFiles graph widget for neo4j in a jupyter lab notebook](https://raw.githubusercontent.com/yWorks/yfiles-jupyter-graphs-for-neo4j/main/images/example.png)
 
 [![PyPI version](https://badge.fury.io/py/yfiles-jupyter-graphs-for-neo4j.svg)](https://badge.fury.io/py/yfiles-jupyter-graphs-for-neo4j)
@@ -19,7 +19,7 @@ or see [README_DEV.md](https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j
 ## Usage
 
 ```python
-from yfiles_jupyter_graphs_for_neo4j.Yfiles_Neo4j_Graphs import YfilesNeo4jGraphs
+from yfiles_jupyter_graphs_for_neo4j import Neo4jGraphWidget
 from neo4j import GraphDatabase
 
 NEO4J_URI      = "neo4j+ssc://demo.neo4jlabs.com" 
@@ -27,7 +27,7 @@ NEO4J_USERNAME = "movies"
 NEO4J_PASSWORD = "movies"
 driver = GraphDatabase.driver(uri = NEO4J_URI, auth = (NEO4J_USERNAME, NEO4J_PASSWORD), database = 'movies')
 
-g = YfilesNeo4jGraphs(driver)
+g = Neo4jGraphWidget(driver)
 
 g.show_cypher("MATCH (s)-[r]->(t) RETURN s,r,t LIMIT 20")
 ```
@@ -43,11 +43,11 @@ see [supported environments](https://github.com/yWorks/yfiles-jupyter-graphs/tre
 
 ## Documentation
 
-The main class `YfilesNeo4jGraphs` provides the following API:
+The main class `Neo4jGraphWidget` provides the following API:
 
 ### Constructor
 
-- `YfilesNeo4jGraphs`: Creates a new class instance with the following arguments
+- `Neo4jGraphWidget`: Creates a new class instance with the following arguments
 
 | Argument             | Description                                                                                                                                                                                                               | Default |
 |----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
