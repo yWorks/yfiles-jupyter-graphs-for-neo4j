@@ -40,7 +40,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: dist/
+      - name: Display structure of downloaded files
+        run: dist/
       - name: Publish package distributions to PyPI
+        if: false # deactivated for testing purpose
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
