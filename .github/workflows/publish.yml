@@ -31,7 +31,7 @@ jobs:
     needs: build
     environment:
       name: testpypi
-      url: https://test.pypi.org/project/yfiles-jupyter-graphs-for-neo4j-test/
+      url: https://test.pypi.org/p/yfiles-jupyter-graphs-for-neo4j-test/
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
