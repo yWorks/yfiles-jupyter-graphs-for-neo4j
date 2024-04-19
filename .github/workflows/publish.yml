@@ -43,7 +43,7 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R dist/
       - name: Publish package distributions to PyPI
-        if: false # deactivated for testing purpose
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
+          packages-dir: dist/artifact
           repository-url: https://test.pypi.org/legacy/
