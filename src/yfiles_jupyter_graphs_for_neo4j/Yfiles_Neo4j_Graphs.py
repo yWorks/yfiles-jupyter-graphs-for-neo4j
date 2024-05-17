@@ -55,7 +55,7 @@ class Neo4jGraphWidget:
         :param autocomplete_relationships: bool | str | list[str]
         """
         if not isinstance(autocomplete_relationships, (bool, str, list)):
-            raise ValueError("autocomplete_relationships must be a bool or a list of strings")
+            raise ValueError("autocomplete_relationships must be a bool, a string, or a list of strings")
         if isinstance(autocomplete_relationships, str):
             self._autocomplete_relationships = [autocomplete_relationships]
         else:
