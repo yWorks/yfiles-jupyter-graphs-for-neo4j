@@ -63,6 +63,10 @@ The main class `Neo4jGraphWidget` provides the following API:
     - `**kwargs`: Additional parameters that should be passed to the cypher query (e.g., see
       the [selection example](https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/selection_example.ipynb)).
 
+The default behavior is to only show the nodes and relationships returned by the cypher query.
+This can be changed to autocomplete relationships like in neo4j browser:
+- `set_autocomplete_relationships(autocomplete_relationships)`: Sets whether to autocomplete relationships in the graph or not.
+
 The cypher queries are executed by the provided Neo4j driver. If you have not specified a driver when instantiating the
 class, you can set
 a driver afterward:
