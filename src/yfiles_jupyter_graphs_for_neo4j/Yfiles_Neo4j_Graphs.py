@@ -50,10 +50,28 @@ class Neo4jGraphWidget:
         Sets the flag to enable or disable autocomplete for relationships.
         When autocomplete is enabled, relationships are automatically completed in the graph,
         similar to the behavior in Neo4j Browser.
-        This feature relies on the APOC procedure apoc.algo.cover, so APOC must be installed.
-        :param autocomplete_relationships: bool
+        This can be set to True/False to enable or disable for all relationships,
+        or a single relationship type or a list of relationship types to enable for specific relationships.
+        :param autocomplete_relationships: bool | str | list[str]
         """
-        self._autocomplete_relationships = autocomplete_relationships
+        if not isinstance(autocomplete_relationships, (bool, str, list)):
+            raise ValueError("autocomplete_relationships must be a bool or a list of strings")
+        if isinstance(autocomplete_relationships, str):
+            self._autocomplete_relationships = [autocomplete_relationships]
+        else:
+            self._autocomplete_relationships = autocomplete_relationships
+
+    def _is_autocomplete_enabled(self):
+        if isinstance(self._autocomplete_relationships, bool):
+            return self._autocomplete_relationships
+        return len(self._autocomplete_relationships) > 0
+
+    def _get_relationship_types_expression(self):
+        if self._autocomplete_relationships == True:
+            return ""
+        elif len(self._autocomplete_relationships) > 0:
+            return "AND type(rel) IN $relationship_types"
+        return ""
 
     def show_cypher(self, cypher, **kwargs):
         """
@@ -62,17 +80,23 @@ class Neo4jGraphWidget:
                **kwargs: variable declarations usable in cypher
         """
         if self._driver is not None:
-            if self._autocomplete_relationships:
+            if self._is_autocomplete_enabled():
                 nodes = self._session.run(cypher, **kwargs).graph().nodes
                 node_ids = [node.element_id for node in nodes]
+                reltypes_expr = self._get_relationship_types_expression()
                 cypher = f"""
-                    MATCH (n) WHERE elementId(n) IN {node_ids}
+                    MATCH (n) WHERE elementId(n) IN $node_ids
                     RETURN n as start, NULL as rel, NULL as end
                     UNION ALL
-                    WITH {node_ids} AS all_nodes
-                    CALL apoc.algo.cover(all_nodes) YIELD rel
-                    RETURN startNode(rel) as start, rel, endNode(rel) AS end
+                    MATCH (n)-[rel]-(m)
+                    WHERE elementId(n) IN $node_ids
+                    AND elementId(m) IN $node_ids
+                    {reltypes_expr}
+                    RETURN n as start, rel, m as end
                 """
+                kwargs = {"node_ids": node_ids}
+                if reltypes_expr:
+                    kwargs["relationship_types"] = self._autocomplete_relationships
             widget = GraphWidget(overview_enabled=self._overview, context_start_with=self._context_start_with,
                                  widget_layout=self._layout, license=self._license,
                                  graph=self._session.run(cypher, **kwargs).graph())
