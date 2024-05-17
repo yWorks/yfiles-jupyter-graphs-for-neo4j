@@ -26,6 +26,7 @@ class Neo4jGraphWidget:
         self._overview = overview_enabled
         self._layout = widget_layout
         self._context_start_with = context_start_with
+        self._autocomplete_relationships = False
 
     def set_driver(self, driver):
         """
@@ -44,6 +45,16 @@ class Neo4jGraphWidget:
         """
         return self._driver
 
+    def set_autocomplete_relationships(self, autocomplete_relationships):
+        """
+        Sets the flag to enable or disable autocomplete for relationships.
+        When autocomplete is enabled, relationships are automatically completed in the graph,
+        similar to the behavior in Neo4j Browser.
+        This feature relies on the APOC procedure apoc.algo.cover, so APOC must be installed.
+        :param autocomplete_relationships: bool
+        """
+        self._autocomplete_relationships = autocomplete_relationships
+
     def show_cypher(self, cypher, **kwargs):
         """
         main function
@@ -51,6 +62,17 @@ class Neo4jGraphWidget:
                **kwargs: variable declarations usable in cypher
         """
         if self._driver is not None:
+            if self._autocomplete_relationships:
+                nodes = self._session.run(cypher, **kwargs).graph().nodes
+                node_ids = [node.element_id for node in nodes]
+                cypher = f"""
+                    MATCH (n) WHERE elementId(n) IN {node_ids}
+                    RETURN n as start, NULL as rel, NULL as end
+                    UNION ALL
+                    WITH {node_ids} AS all_nodes
+                    CALL apoc.algo.cover(all_nodes) YIELD rel
+                    RETURN startNode(rel) as start, rel, endNode(rel) AS end
+                """
             widget = GraphWidget(overview_enabled=self._overview, context_start_with=self._context_start_with,
                                  widget_layout=self._layout, license=self._license,
                                  graph=self._session.run(cypher, **kwargs).graph())
