@@ -18,7 +18,8 @@ class Neo4jGraphWidget:
     _widget = GraphWidget()
 
     def __init__(self, driver=None, widget_layout=None,
-                 overview_enabled=None, context_start_with='About', license=None):
+                 overview_enabled=None, context_start_with='About', license=None,
+                 autocomplete_relationships=False):
         if driver is not None:
             self._driver = driver
         self._session = driver.session()
@@ -26,7 +27,7 @@ class Neo4jGraphWidget:
         self._overview = overview_enabled
         self._layout = widget_layout
         self._context_start_with = context_start_with
-        self._autocomplete_relationships = False
+        self.set_autocomplete_relationships(autocomplete_relationships)
 
     def set_driver(self, driver):
         """
@@ -67,9 +68,7 @@ class Neo4jGraphWidget:
         return len(self._autocomplete_relationships) > 0
 
     def _get_relationship_types_expression(self):
-        if self._autocomplete_relationships == True:
-            return ""
-        elif len(self._autocomplete_relationships) > 0:
+        if isinstance(self._autocomplete_relationships, list) and len(self._autocomplete_relationships) > 0:
             return "AND type(rel) IN $relationship_types"
         return ""
 
