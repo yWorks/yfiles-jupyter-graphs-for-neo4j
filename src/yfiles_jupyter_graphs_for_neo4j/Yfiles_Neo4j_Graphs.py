@@ -18,7 +18,8 @@ class Neo4jGraphWidget:
     _widget = GraphWidget()
 
     def __init__(self, driver=None, widget_layout=None,
-                 overview_enabled=None, context_start_with='About', license=None):
+                 overview_enabled=None, context_start_with='About', license=None,
+                 autocomplete_relationships=False):
         if driver is not None:
             self._driver = driver
         self._session = driver.session()
@@ -26,6 +27,7 @@ class Neo4jGraphWidget:
         self._overview = overview_enabled
         self._layout = widget_layout
         self._context_start_with = context_start_with
+        self.set_autocomplete_relationships(autocomplete_relationships)
 
     def set_driver(self, driver):
         """
@@ -44,6 +46,32 @@ class Neo4jGraphWidget:
         """
         return self._driver
 
+    def set_autocomplete_relationships(self, autocomplete_relationships):
+        """
+        Sets the flag to enable or disable autocomplete for relationships.
+        When autocomplete is enabled, relationships are automatically completed in the graph,
+        similar to the behavior in Neo4j Browser.
+        This can be set to True/False to enable or disable for all relationships,
+        or a single relationship type or a list of relationship types to enable for specific relationships.
+        :param autocomplete_relationships: bool | str | list[str]
+        """
+        if not isinstance(autocomplete_relationships, (bool, str, list)):
+            raise ValueError("autocomplete_relationships must be a bool, a string, or a list of strings")
+        if isinstance(autocomplete_relationships, str):
+            self._autocomplete_relationships = [autocomplete_relationships]
+        else:
+            self._autocomplete_relationships = autocomplete_relationships
+
+    def _is_autocomplete_enabled(self):
+        if isinstance(self._autocomplete_relationships, bool):
+            return self._autocomplete_relationships
+        return len(self._autocomplete_relationships) > 0
+
+    def _get_relationship_types_expression(self):
+        if isinstance(self._autocomplete_relationships, list) and len(self._autocomplete_relationships) > 0:
+            return "AND type(rel) IN $relationship_types"
+        return ""
+
     def show_cypher(self, cypher, **kwargs):
         """
         main function
@@ -51,6 +79,23 @@ class Neo4jGraphWidget:
                **kwargs: variable declarations usable in cypher
         """
         if self._driver is not None:
+            if self._is_autocomplete_enabled():
+                nodes = self._session.run(cypher, **kwargs).graph().nodes
+                node_ids = [node.element_id for node in nodes]
+                reltypes_expr = self._get_relationship_types_expression()
+                cypher = f"""
+                    MATCH (n) WHERE elementId(n) IN $node_ids
+                    RETURN n as start, NULL as rel, NULL as end
+                    UNION ALL
+                    MATCH (n)-[rel]-(m)
+                    WHERE elementId(n) IN $node_ids
+                    AND elementId(m) IN $node_ids
+                    {reltypes_expr}
+                    RETURN n as start, rel, m as end
+                """
+                kwargs = {"node_ids": node_ids}
+                if reltypes_expr:
+                    kwargs["relationship_types"] = self._autocomplete_relationships
             widget = GraphWidget(overview_enabled=self._overview, context_start_with=self._context_start_with,
                                  widget_layout=self._layout, license=self._license,
                                  graph=self._session.run(cypher, **kwargs).graph())
