@@ -4,5 +4,4 @@ channels:
 dependencies:
   - python
   - jupyterlab
-  - neo4j
   - build
