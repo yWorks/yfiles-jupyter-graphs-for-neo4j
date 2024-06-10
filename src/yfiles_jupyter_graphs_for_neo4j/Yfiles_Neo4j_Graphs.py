@@ -11,7 +11,7 @@ from yfiles_jupyter_graphs import GraphWidget
 
 POSSIBLE_NODE_BINDINGS = {'color', 'size', 'type', 'styles', 'scale_factor', 'position', 'layout', 'property', 'label'}
 POSSIBLE_EDGE_BINDINGS = {'color', 'thickness_factor', 'property', 'label'}
-NEO4J_LABEL_KEYS = ['name', 'title', 'label', 'description', 'caption', 'text']
+NEO4J_LABEL_KEYS = ['name', 'title', 'text', 'description', 'caption', 'label']
 
 class Neo4jGraphWidget:
     _driver = None
