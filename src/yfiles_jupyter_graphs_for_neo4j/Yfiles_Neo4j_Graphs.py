@@ -103,6 +103,7 @@ class Neo4jGraphWidget:
                                  graph=self._session.run(cypher, **kwargs).graph())
             self.__apply_node_mappings(widget)
             self.__apply_edge_mappings(widget)
+            self.__apply_heat_mapping({**self._node_configurations, **self._edge_configurations}, widget)
 
             self._widget = widget
             widget.show()
@@ -135,8 +136,17 @@ class Neo4jGraphWidget:
             if binding_key == "label":
                 return Neo4jGraphWidget.__get_neo4j_item_text(item)
             else:
-                return default_mapping(index, item)
+                try:
+                    return default_mapping(index, item)
+                except:
+                    return default_mapping(item)
         return mapping
+
+    def __apply_heat_mapping(self, configuration, widget):
+        setattr(widget, "_heat_mapping",
+                Neo4jGraphWidget.__configuration_mapper_factory('heat', configuration,
+                                                                getattr(widget, 'default_heat_mapping')))
+
 
     def __apply_node_mappings(self, widget):
         for key in POSSIBLE_NODE_BINDINGS:
