@@ -4,6 +4,7 @@ The main Neo4jGraphWidget class is defined in this module.
 
 """
 from typing import Dict
+import inspect
 
 from yfiles_jupyter_graphs import GraphWidget
 
@@ -136,10 +137,12 @@ class Neo4jGraphWidget:
             if binding_key == "label":
                 return Neo4jGraphWidget.__get_neo4j_item_text(item)
             else:
-                try:
+                # call default mapping
+                # some default mappings do not support "index" as first parameter
+                parameters = inspect.signature(default_mapping).parameters
+                if len(parameters) > 1 and parameters[list(parameters)[0]].annotation == int:
                     return default_mapping(index, item)
-                except TypeError:
-                    # catch wrong positional arguments to fallback for mappings that do not support an index parameter
+                else:
                     return default_mapping(item)
         return mapping
 
