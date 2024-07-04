@@ -138,7 +138,8 @@ class Neo4jGraphWidget:
             else:
                 try:
                     return default_mapping(index, item)
-                except:
+                except TypeError:
+                    # catch wrong positional arguments to fallback for mappings that do not support an index parameter
                     return default_mapping(item)
         return mapping
 
