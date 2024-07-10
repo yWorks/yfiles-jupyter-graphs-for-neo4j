@@ -143,6 +143,24 @@ It can import and visualize graphs from various popular Python packages
 And provides a rich set of visualization options to bring your data to life (see
 the [example notebooks](https://github.com/yWorks/yfiles-jupyter-graphs/blob/main/examples/00_toc.ipynb)).
 
+### Features
+<table>
+    <tr>
+        <td><a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"><img src="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/tree/main/images/features/heat_feature.png" title="Configure Heat Mappings" alt="node heat_mapping"></a>
+        <a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb">See Heat Feature</a><br><a target="_blank" href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"></a></td>
+        <td><a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"><img src="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/tree/main/images/features/map_feature.png" title="Choose a Map Layout" alt="leaflet"></a>
+        <a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"> Choose a Leaflet Map Layout</a><br><a target="_blank" href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"></a></td>
+    </tr>
+    <tr>
+        <td><a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"><img src="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/tree/main/images/features/grouping_feature.png" title="Configure Parent Mappings" alt="node nesting"></a>
+        <a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb">See Nested Graph Feature</a><br><a target="_blank" href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"></a></td>
+        <td><a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"><img src="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/tree/main/images/features/size_feature.png" title="Choose a different sizes" alt="size and edge thickness"></a>
+        <a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb">Define different node and edges sizes</a><br><a target="_blank" href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"></a></td>
+    </tr>
+</table>
+
+For a detailed feature guide, check out the main widget [example notebooks](https://colab.research.google.com/github/yWorks/yfiles-jupyter-graphs/blob/main/examples/00_toc.ipynb)
+
 ## Code of Conduct
 
 This project and everyone participating in it is governed by
