@@ -153,23 +153,18 @@ class Neo4jGraphWidget:
                 Neo4jGraphWidget.__configuration_mapper_factory('heat', configuration,
                                                                 getattr(widget, 'default_heat_mapping')))
 
-    def __apply_parent_mapping(self, configuration, widget):
+    def __apply_parent_mapping(self, group_relationships: list[str], widget):
 
-        parent_dict = {}
-        def create_parent_dict(item: Dict):
-            label = item["properties"]["label"]
-            if label in configuration:
-                start = item['start']       # child node id
-                end = item['end']           # parent node id
-                parent_dict[start] = end
-                widget.edges.remove(item)
+        node_to_parent = {}
+        for edge in widget.edges[:]:
+            rel_type = edge["properties"]["label"]
+            if rel_type in group_relationships:
+                start = edge['start']       # child node id
+                end = edge['end']           # parent node id
+                node_to_parent[start] = end
+                widget.edges.remove(edge)
 
-        for edge in widget.edges:
-            create_parent_dict(edge)
-        def mapping(item):
-            return parent_dict.get(item['id'])
-
-        setattr(widget, "_node_parent_mapping", mapping)
+        setattr(widget, "_node_parent_mapping", lambda node: node_to_parent.get(node['id']))
 
     def __apply_node_mappings(self, widget):
         for key in POSSIBLE_NODE_BINDINGS:
@@ -201,9 +196,8 @@ class Neo4jGraphWidget:
             config["label"] = text_binding
         self._edge_configurations[type] = {key: value for key, value in config.items()}
 
-    def add_parent_configuration(self, type, auto_completion=True):
+    def add_parent_configuration(self, type):
         self._parent_configurations.append(type)
-        self.set_autocomplete_relationships(auto_completion)
 
     def del_node_configuration(self, type):
         if type in self._node_configurations:
@@ -214,7 +208,7 @@ class Neo4jGraphWidget:
             del self._edge_configurations[type]
     def del_parent_configuration(self, type):
         if type in self._parent_configurations:
-            del self._parent_configurations[type]
+            self._parent_configurations.remove(type)
 
     def get_selected_node_ids(self, widget=None):
         graph = widget if widget is not None else self._widget
