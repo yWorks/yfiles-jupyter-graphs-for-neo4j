@@ -18,7 +18,7 @@ class Neo4jGraphWidget:
     _driver = None
     _node_configurations = {}
     _edge_configurations = {}
-    _parent_configurations = []
+    _parent_configurations = set()
     _widget = GraphWidget()
 
     def __init__(self, driver=None, widget_layout=None,
@@ -197,7 +197,7 @@ class Neo4jGraphWidget:
         self._edge_configurations[type] = {key: value for key, value in config.items()}
 
     def add_parent_configuration(self, type):
-        self._parent_configurations.append(type)
+        self._parent_configurations.add(type)
 
     def del_node_configuration(self, type):
         if type in self._node_configurations:
