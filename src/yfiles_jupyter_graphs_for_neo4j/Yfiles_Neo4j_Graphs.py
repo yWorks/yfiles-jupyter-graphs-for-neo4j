@@ -156,13 +156,17 @@ class Neo4jGraphWidget:
     def __apply_parent_mapping(self, group_relationships: list[str], widget):
 
         node_to_parent = {}
+        edge_ids_to_remove = set()
         for edge in widget.edges[:]:
             rel_type = edge["properties"]["label"]
             if rel_type in group_relationships:
                 start = edge['start']       # child node id
                 end = edge['end']           # parent node id
                 node_to_parent[start] = end
-                widget.edges = list(filter(lambda edges: edges['id'] != edge['id'], widget.edges))
+                edge_ids_to_remove.add(edge['id'])
+
+        # use list comprehension to filter out the edges to automatically trigger model sync with the frontend
+        widget.edges = [edge for edge in widget.edges if edge['id'] not in edge_ids_to_remove]
 
         setattr(widget, "_node_parent_mapping", lambda node: node_to_parent.get(node['id']))
 
