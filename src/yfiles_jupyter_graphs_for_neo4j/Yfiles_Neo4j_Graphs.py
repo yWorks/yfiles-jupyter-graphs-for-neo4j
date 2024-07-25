@@ -162,7 +162,7 @@ class Neo4jGraphWidget:
                 start = edge['start']       # child node id
                 end = edge['end']           # parent node id
                 node_to_parent[start] = end
-                widget.edges.remove(edge)
+                widget.edges = list(filter(lambda edges: edges['id'] != edge['id'], widget.edges))
 
         setattr(widget, "_node_parent_mapping", lambda node: node_to_parent.get(node['id']))
 
