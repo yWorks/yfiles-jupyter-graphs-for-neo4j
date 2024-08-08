@@ -10,7 +10,8 @@ from yfiles_jupyter_graphs import GraphWidget
 
 # TODO maybe change to get dynamically when adding bindings
 
-POSSIBLE_NODE_BINDINGS = {'parent', 'coordinate', 'color', 'size', 'type', 'styles', 'scale_factor', 'position', 'layout', 'property', 'label'}
+POSSIBLE_NODE_BINDINGS = {'coordinate', 'color', 'size', 'type', 'styles', 'scale_factor', 'position',
+                          'layout', 'property', 'label'}
 POSSIBLE_EDGE_BINDINGS = {'color', 'thickness_factor', 'property', 'label'}
 NEO4J_LABEL_KEYS = ['name', 'title', 'text', 'description', 'caption', 'label']
 
@@ -103,10 +104,11 @@ class Neo4jGraphWidget:
             widget = GraphWidget(overview_enabled=self._overview, context_start_with=self._context_start_with,
                                  widget_layout=self._layout, license=self._license,
                                  graph=self._session.run(cypher, **kwargs).graph())
+            self.create_group_nodes(self._node_configurations, widget)
             self.__apply_node_mappings(widget)
             self.__apply_edge_mappings(widget)
             self.__apply_heat_mapping({**self._node_configurations, **self._edge_configurations}, widget)
-            self.__apply_parent_mapping(self._parent_configurations, widget)
+            self.__apply_parent_mapping(widget)
 
             self._widget = widget
             widget.show()
@@ -128,13 +130,17 @@ class Neo4jGraphWidget:
             if label in configurations and binding_key in configurations.get(label):
                 # mapping
                 if callable(configurations.get(label)[binding_key]):
-                    return configurations.get(label)[binding_key](item)
+                    result = configurations.get(label)[binding_key](item)
                 # property name
                 elif configurations.get(label)[binding_key] in item["properties"]:
-                    return item["properties"][configurations.get(label).get(binding_key)]
+                    result = item["properties"][configurations.get(label).get(binding_key)]
                 # constant value
                 else:
-                    return configurations.get(label).get(binding_key)
+                    result = configurations.get(label).get(binding_key)
+                if binding_key != 'parent_configuration':
+                    return result
+                else:
+                    return 'GroupNode' + str(result)
 
             if binding_key == "label":
                 return Neo4jGraphWidget.__get_neo4j_item_text(item)
@@ -153,28 +159,54 @@ class Neo4jGraphWidget:
                 Neo4jGraphWidget.__configuration_mapper_factory('heat', configuration,
                                                                 getattr(widget, 'default_heat_mapping')))
 
-    def __apply_parent_mapping(self, group_relationships: list[str], widget):
+    def create_group_nodes(self, configurations, widget):
+        group_node_properties = set()
+        group_node_values = set()
+        binding_key = 'parent_configuration'
+        for node in widget.nodes:
+            label = node['properties']['label']
+            if label in configurations and binding_key in configurations.get(label):
+                if configurations.get(label)[binding_key] in node["properties"]:
+                    group_node_properties.add(node["properties"][configurations.get(label).get(binding_key)])
+                else:
+                    group_node_values.add(configurations.get(label).get(binding_key))
+
+        for label in group_node_properties.union(group_node_values):
+            node = {'id': 'GroupNode' + label, 'properties': {'label': label}}
+            widget.nodes = [*widget.nodes, node]
+
+    def __apply_parent_mapping(self, widget):
 
         node_to_parent = {}
         edge_ids_to_remove = set()
         for edge in widget.edges[:]:
             rel_type = edge["properties"]["label"]
-            if rel_type in group_relationships:
-                start = edge['start']       # child node id
-                end = edge['end']           # parent node id
-                node_to_parent[start] = end
-                edge_ids_to_remove.add(edge['id'])
+            for (parent_type, is_reversed) in self._parent_configurations:
+                if rel_type == parent_type:
+                    start = edge['start']  # child node id
+                    end = edge['end']  # parent node id
+                    if is_reversed:
+                        node_to_parent[end] = start
+                    else:
+                        node_to_parent[start] = end
+                    edge_ids_to_remove.add(edge['id'])
+                    break
 
         # use list comprehension to filter out the edges to automatically trigger model sync with the frontend
         widget.edges = [edge for edge in widget.edges if edge['id'] not in edge_ids_to_remove]
-
-        setattr(widget, "_node_parent_mapping", lambda node: node_to_parent.get(node['id']))
+        current_parent_mapping = getattr(widget, '_node_parent_mapping')
+        setattr(widget, "_node_parent_mapping",
+                lambda index, node: node_to_parent.get(node['id'], current_parent_mapping(index, node)))
 
     def __apply_node_mappings(self, widget):
         for key in POSSIBLE_NODE_BINDINGS:
             default_mapping = getattr(widget, f"default_node_{key}_mapping")
             setattr(widget, f"_node_{key}_mapping",
                     Neo4jGraphWidget.__configuration_mapper_factory(key, self._node_configurations, default_mapping))
+        # manually set parent configuration
+        setattr(widget, f"_node_parent_mapping",
+                Neo4jGraphWidget.__configuration_mapper_factory('parent_configuration',
+                                                                self._node_configurations, lambda node: None))
 
     def __apply_edge_mappings(self, widget):
         for key in POSSIBLE_EDGE_BINDINGS:
@@ -200,8 +232,8 @@ class Neo4jGraphWidget:
             config["label"] = text_binding
         self._edge_configurations[type] = {key: value for key, value in config.items()}
 
-    def add_parent_configuration(self, type):
-        self._parent_configurations.add(type)
+    def add_parent_relationship_configuration(self, type, reverse=False):
+        self._parent_configurations.add((type, reverse))
 
     def del_node_configuration(self, type):
         if type in self._node_configurations:
@@ -210,9 +242,11 @@ class Neo4jGraphWidget:
     def del_relationship_configuration(self, type):
         if type in self._edge_configurations:
             del self._edge_configurations[type]
-    def del_parent_configuration(self, type):
-        if type in self._parent_configurations:
-            self._parent_configurations.remove(type)
+
+    def del_parent_relationship_configuration(self, type):
+        self._parent_configurations = {
+            rel_type for rel_type in self._parent_configurations if rel_type[0] != type
+        }
 
     def get_selected_node_ids(self, widget=None):
         graph = widget if widget is not None else self._widget
