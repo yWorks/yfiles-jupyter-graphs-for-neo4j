@@ -132,8 +132,15 @@ class Neo4jGraphWidget:
                 if callable(configurations.get(label)[binding_key]):
                     result = configurations.get(label)[binding_key](item)
                 # property name
-                elif configurations.get(label)[binding_key] in item["properties"]:
+                elif (not isinstance(configurations.get(label)[binding_key], dict) and
+                      configurations.get(label)[binding_key] in item["properties"]):
                     result = item["properties"][configurations.get(label).get(binding_key)]
+                # constant value or dictionary
+                elif binding_key == 'parent_configuration':
+                    if isinstance(configurations.get(label).get(binding_key), dict):
+                        result = configurations.get(label).get(binding_key).get('text', '')
+                    else:
+                        result = configurations.get(label).get(binding_key)
                 # constant value
                 else:
                     result = configurations.get(label).get(binding_key)
@@ -162,17 +169,26 @@ class Neo4jGraphWidget:
     def create_group_nodes(self, configurations, widget):
         group_node_properties = set()
         group_node_values = set()
-        binding_key = 'parent_configuration'
+        key = 'parent_configuration'
         for node in widget.nodes:
             label = node['properties']['label']
-            if label in configurations and binding_key in configurations.get(label):
-                if configurations.get(label)[binding_key] in node["properties"]:
-                    group_node_properties.add(node["properties"][configurations.get(label).get(binding_key)])
+            if label in configurations and key in configurations.get(label):
+                group_node = configurations.get(label).get(key)
+                if isinstance(group_node, str):
+                    # string or property value
+                    if group_node in node["properties"]:
+                        group_node_properties.add(str(node["properties"][group_node]))
+                    else:
+                        group_node_values.add(group_node)
                 else:
-                    group_node_values.add(configurations.get(label).get(binding_key))
+                    # dictionary with values
+                    text = group_node.get('text', '')
+                    group_node_values.add(text)
+                    configuration = {k: v for k, v in group_node.items() if k != 'text'}
+                    self.add_node_configuration(text, **configuration)
 
-        for label in group_node_properties.union(group_node_values):
-            node = {'id': 'GroupNode' + label, 'properties': {'label': label}}
+        for group_label in group_node_properties.union(group_node_values):
+            node = {'id': 'GroupNode' + group_label, 'properties': {'label': group_label}}
             widget.nodes = [*widget.nodes, node]
 
     def __apply_parent_mapping(self, widget):
