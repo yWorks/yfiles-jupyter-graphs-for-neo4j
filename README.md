@@ -89,19 +89,25 @@ functions:
         - `type`: Defines a specific "type" for the node as described
           in [yFiles Graphs for Jupyter](https://yworks.github.io/yfiles-jupyter-graphs/02_graph_widget/#def-default_node_type_mappingindex-node)
           which affects the automatic positioning of nodes (same "type"s are preferred to be placed next to each other).
+        - `parent_configuration`: Configure grouping for this node label. See [grouping.ipynb](https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/grouping.ipynb)
+          for examples.
 
 - `add_relationship_configuration(type, **kwargs)`
-    - `type`: The edge type for which this configuration should be used.
+    - `type`: The relationship type for which this configuration should be used.
     - `**kwargs`: Visualization configuration for the given relationship type. The following arguments are supported:
         - `text`: The text that displayed at the relationship. By default, the relationship's type is used.
         - `color`: The relationship's color.
         - `thickness_factor`: The relationship's stroke thickness factor. By default, `1`.
         - `property`: Allows to specify additional properties on the relationship, which may be bound by other bindings.
 
+- `add_parent_relationship_configuration(type)`
+    - `type`: The relationship type that should be visualized as node grouping hierarchy instead of the actual relationship.  
+
 To remove a configuration use the following functions: 
 
 - `del_node_configuration(type)`: Deletes configuration for the given node label.
 - `del_relationship_configurations(type)`: Deletes configuration for the given relationship type.
+- `del_parent_relationship_configuration(type)`: Deletes configuration for the given parent relationship type.
 
 You can select nodes and relationships to retrieve their ids. For example, you can use these ids in new cypher queries
 by providing them as parameter to `show_cypher` as shown in
