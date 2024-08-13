@@ -19,7 +19,6 @@ class Neo4jGraphWidget:
     _driver = None
     _node_configurations = {}
     _edge_configurations = {}
-    _parent_configurations = set()
     _widget = GraphWidget()
 
     def __init__(self, driver=None, widget_layout=None,
@@ -33,6 +32,8 @@ class Neo4jGraphWidget:
         self._layout = widget_layout
         self._context_start_with = context_start_with
         self.set_autocomplete_relationships(autocomplete_relationships)
+
+        self._parent_configurations = set()
 
     def set_driver(self, driver):
         """
@@ -104,7 +105,7 @@ class Neo4jGraphWidget:
             widget = GraphWidget(overview_enabled=self._overview, context_start_with=self._context_start_with,
                                  widget_layout=self._layout, license=self._license,
                                  graph=self._session.run(cypher, **kwargs).graph())
-            self.create_group_nodes(self._node_configurations, widget)
+            self.__create_group_nodes(self._node_configurations, widget)
             self.__apply_node_mappings(widget)
             self.__apply_edge_mappings(widget)
             self.__apply_heat_mapping({**self._node_configurations, **self._edge_configurations}, widget)
@@ -166,7 +167,7 @@ class Neo4jGraphWidget:
                 Neo4jGraphWidget.__configuration_mapper_factory('heat', configuration,
                                                                 getattr(widget, 'default_heat_mapping')))
 
-    def create_group_nodes(self, configurations, widget):
+    def __create_group_nodes(self, configurations, widget):
         group_node_properties = set()
         group_node_values = set()
         key = 'parent_configuration'
