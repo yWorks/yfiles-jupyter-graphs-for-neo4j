@@ -155,8 +155,8 @@ the [example notebooks](https://github.com/yWorks/yfiles-jupyter-graphs/blob/mai
     <tr>
         <td><a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"><img src="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/images/features/size_feature.png" title="Data-driven item visualization" alt="Data-driven item visualization"></a>
         <a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb">Data-driven item visualization</a><br><a target="_blank" href="https://colab.research.google.com/github/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a></td>
-        <td><a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/Grouping.ipynb"><img src="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/images/features/grouping_feature.png" title="Configure Parent Mappings" alt="node nesting"></a>
-        <a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/Grouping.ipynb">See Nested Graph Feature</a><br><a target="_blank" href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/Grouping.ipynb"></a></td>
+        <td><a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/grouping.ipynb"><img src="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/images/features/grouping_feature.png" title="Grouped items" alt="node nesting"></a>
+        <a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/grouping.ipynb">Group items</a><br><a target="_blank" href="https://colab.research.google.com/github/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/grouping.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a></td>
     </tr>
 </table>
 
