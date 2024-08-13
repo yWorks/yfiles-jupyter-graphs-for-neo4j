@@ -152,8 +152,8 @@ the [example notebooks](https://github.com/yWorks/yfiles-jupyter-graphs/blob/mai
         <a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"> Choose a Leaflet Map Layout</a><br><a target="_blank" href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"></a></td>
     </tr>
     <tr>
-        <td><a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"><img src="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/images/features/grouping_feature.png" title="Configure Parent Mappings" alt="node nesting"></a>
-        <a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb">See Nested Graph Feature</a><br><a target="_blank" href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"></a></td>
+        <td><a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/Grouping.ipynb"><img src="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/images/features/grouping_feature.png" title="Configure Parent Mappings" alt="node nesting"></a>
+        <a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/Grouping.ipynb">See Nested Graph Feature</a><br><a target="_blank" href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/Grouping.ipynb"></a></td>
         <td><a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"><img src="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/images/features/size_feature.png" title="Choose a different sizes" alt="size and edge thickness"></a>
         <a href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb">Define different node and edges sizes</a><br><a target="_blank" href="https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/feature_example.ipynb"></a></td>
     </tr>
