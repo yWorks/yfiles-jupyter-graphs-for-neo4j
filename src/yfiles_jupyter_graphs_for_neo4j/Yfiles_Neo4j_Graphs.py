@@ -16,16 +16,11 @@ POSSIBLE_EDGE_BINDINGS = {'color', 'thickness_factor', 'property', 'label'}
 NEO4J_LABEL_KEYS = ['name', 'title', 'text', 'description', 'caption', 'label']
 
 class Neo4jGraphWidget:
-    _driver = None
-    _node_configurations = {}
-    _edge_configurations = {}
-    _widget = GraphWidget()
-
     def __init__(self, driver=None, widget_layout=None,
                  overview_enabled=None, context_start_with='About', license=None,
                  autocomplete_relationships=False):
-        if driver is not None:
-            self._driver = driver
+        self._widget = GraphWidget()
+        self._driver = driver
         self._session = driver.session()
         self._license = license
         self._overview = overview_enabled
@@ -33,6 +28,8 @@ class Neo4jGraphWidget:
         self._context_start_with = context_start_with
         self.set_autocomplete_relationships(autocomplete_relationships)
 
+        self._node_configurations = {}
+        self._edge_configurations = {}
         self._parent_configurations = set()
 
     def set_driver(self, driver):
