@@ -100,8 +100,9 @@ functions:
         - `thickness_factor`: The relationship's stroke thickness factor. By default, `1`.
         - `property`: Allows to specify additional properties on the relationship, which may be bound by other bindings.
 
-- `add_parent_relationship_configuration(type)`
-    - `type`: The relationship type that should be visualized as node grouping hierarchy instead of the actual relationship.  
+- `add_parent_relationship_configuration(type, reverse=False)`
+    - `type`: The relationship type that should be visualized as node grouping hierarchy instead of the actual relationship.
+    - `reverse`: By default the target node is considered as parent. This can be reverted with this argument.
 
 To remove a configuration use the following functions: 
 
