@@ -17,7 +17,7 @@ NEO4J_LABEL_KEYS = ['name', 'title', 'text', 'description', 'caption', 'label']
 
 class Neo4jGraphWidget:
     def __init__(self, driver=None, widget_layout=None,
-                 overview_enabled=None, context_start_with='About', license=None,
+                 overview_enabled=None, context_start_with=None, license=None,
                  autocomplete_relationships=False):
         self._widget = GraphWidget()
         self._driver = driver
