@@ -49,19 +49,29 @@ The main class `Neo4jGraphWidget` provides the following API:
 
 - `Neo4jGraphWidget`: Creates a new class instance with the following arguments
 
-| Argument           | Description                                                                                                                                                                                                               | Default   |
-|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
-| `driver`           | The neo4j `driver` that is used to execute cypher queries.                                                                                                                                                                | `None`    |
-| `widget_layout`    | Can be used to specify general widget appearance through css attributes. See ipywidget's [`layout`](https://ipywidgets.readthedocs.io/en/stable/examples/Widget%20Layout.html#the-layout-attribute) for more information. | `None`    |
-| `overview_enabled` | Enable graph overview component. Default behaviour depends on cell width.                                                                                                                                                 | `None`    |
-| `graph_layout`     | Can be used to specify a general default node and edge layout                                                                                                                                                             | `organic` |
+| Argument           | Description                                                                                                                                                                                                                                           | Default   |
+|--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| `driver`           | The neo4j `driver` that is used to execute cypher queries.                                                                                                                                                                                            | `None`    |
+| `widget_layout`    | Can be used to specify general widget appearance through css attributes. See ipywidget's [`layout`](https://ipywidgets.readthedocs.io/en/stable/examples/Widget%20Layout.html#the-layout-attribute) for more information.                             | `None`    |
+| `overview_enabled` | Enable graph overview component. Default behaviour depends on cell width.                                                                                                                                                                             | `None`    |
+| `graph_layout`     | Can be used to specify a general default node and edge layout. Available algorithms are: ["circular", "hierarchic", "organic", "orthogonal", "radial", "tree", "orthogonal_edge_router", "organic_edge_router", "interactive_organic_layout", "map"]  | `organic` |
 
 ### Methods 
 
 - `show_cypher(cypher, graph_layout=None, **kwargs)`
     - `cypher`: The [cypher query](https://neo4j.com/docs/cypher-manual/current/introduction/) that should be
       visualized.
-    - `graph_layout`: The graph layout that is used. This overwrites the general graph_layout in this specific graph instance
+    - `graph_layout`: The graph layout that is used. This overwrites the general graph_layout in this specific graph instance. The following arguments are supported:
+        - `hierarchic`
+        - `organic`
+        - `circular`
+        - `orthogonal`
+        - `tree`
+        - `radial`
+        - `orthogonal_edge_router`
+        - `organic_edge_router`
+        - `interactive_organic_layout`
+        - `map`
     - `**kwargs`: Additional parameters that should be passed to the cypher query (e.g., see
       the [selection example](https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/selection_example.ipynb)).
 

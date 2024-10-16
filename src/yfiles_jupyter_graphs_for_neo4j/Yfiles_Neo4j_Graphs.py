@@ -109,9 +109,9 @@ class Neo4jGraphWidget:
             self.__apply_heat_mapping({**self._node_configurations, **self._edge_configurations}, widget)
             self.__apply_parent_mapping(widget)
             if graph_layout is None:
-                widget.set_graph_layout(**dict(algorithm=self._graph_layout))
+                widget.set_graph_layout(self._graph_layout)
             else:
-                widget.set_graph_layout(**dict(algorithm=graph_layout))
+                widget.set_graph_layout(graph_layout)
 
             self._widget = widget
             widget.show()
