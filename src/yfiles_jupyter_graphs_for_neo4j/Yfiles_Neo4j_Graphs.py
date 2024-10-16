@@ -18,7 +18,7 @@ NEO4J_LABEL_KEYS = ['name', 'title', 'text', 'description', 'caption', 'label']
 class Neo4jGraphWidget:
     def __init__(self, driver=None, widget_layout=None,
                  overview_enabled=None, context_start_with=None, license=None,
-                 autocomplete_relationships=False):
+                 autocomplete_relationships=False, graph_layout='organic'):
         self._widget = GraphWidget()
         self._driver = driver
         self._session = driver.session()
@@ -27,6 +27,7 @@ class Neo4jGraphWidget:
         self._layout = widget_layout
         self._context_start_with = context_start_with
         self.set_autocomplete_relationships(autocomplete_relationships)
+        self._graph_layout = graph_layout
 
         self._node_configurations = {}
         self._edge_configurations = {}
@@ -75,7 +76,7 @@ class Neo4jGraphWidget:
             return "AND type(rel) IN $relationship_types"
         return ""
 
-    def show_cypher(self, cypher, **kwargs):
+    def show_cypher(self, cypher, graph_layout=None, **kwargs):
         """
         main function
         :param cypher: str, Send a data query to the neo4j database
@@ -107,6 +108,10 @@ class Neo4jGraphWidget:
             self.__apply_edge_mappings(widget)
             self.__apply_heat_mapping({**self._node_configurations, **self._edge_configurations}, widget)
             self.__apply_parent_mapping(widget)
+            if graph_layout is None:
+                widget.set_graph_layout(**dict(algorithm=self._graph_layout))
+            else:
+                widget.set_graph_layout(**dict(algorithm=graph_layout))
 
             self._widget = widget
             widget.show()
