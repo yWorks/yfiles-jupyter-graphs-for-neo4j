@@ -54,14 +54,14 @@ The main class `Neo4jGraphWidget` provides the following API:
 | `driver`           | The neo4j `driver` that is used to execute cypher queries.                                                                                                                                                                                         | `None`    |
 | `widget_layout`    | Can be used to specify general widget appearance through css attributes. See ipywidget's [`layout`](https://ipywidgets.readthedocs.io/en/stable/examples/Widget%20Layout.html#the-layout-attribute) for more information.                          | `None`    |
 | `overview_enabled` | Enable graph overview component. Default behaviour depends on cell width.                                                                                                                                                                          | `None`    |
-| `graph_layout`     | Can be used to specify a general default node and edge layout. Available algorithms are: "circular", "hierarchic", "organic", "interactive_organic_layout", "orthogonal", "radial", "tree", "map", "orthogonal_edge_router", "organic_edge_router" | `organic` |
+| `layout`     | Can be used to specify a general default node and edge layout. Available algorithms are: "circular", "hierarchic", "organic", "interactive_organic_layout", "orthogonal", "radial", "tree", "map", "orthogonal_edge_router", "organic_edge_router" | `organic` |
 
 ### Methods 
 
-- `show_cypher(cypher, graph_layout=None, **kwargs)`
+- `show_cypher(cypher, layout=None, **kwargs)`
     - `cypher`: The [cypher query](https://neo4j.com/docs/cypher-manual/current/introduction/) that should be
       visualized.
-    - `graph_layout`: The graph layout that is used. This overwrites the general graph_layout in this specific graph instance. The following arguments are supported:
+    - `layout`: The graph layout that is used. This overwrites the general layout in this specific graph instance. The following arguments are supported:
         - `hierarchic`
         - `organic`
         - `interactive_organic_layout`
