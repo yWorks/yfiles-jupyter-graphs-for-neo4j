@@ -18,7 +18,7 @@ NEO4J_LABEL_KEYS = ['name', 'title', 'text', 'description', 'caption', 'label']
 class Neo4jGraphWidget:
     def __init__(self, driver=None, widget_layout=None,
                  overview_enabled=None, context_start_with=None, license=None,
-                 autocomplete_relationships=False, graph_layout='organic'):
+                 autocomplete_relationships=False, layout='organic'):
         self._widget = GraphWidget()
         self._driver = driver
         self._session = driver.session()
@@ -27,7 +27,7 @@ class Neo4jGraphWidget:
         self._layout = widget_layout
         self._context_start_with = context_start_with
         self.set_autocomplete_relationships(autocomplete_relationships)
-        self._graph_layout = graph_layout
+        self._graph_layout = layout
 
         self._node_configurations = {}
         self._edge_configurations = {}
@@ -76,11 +76,15 @@ class Neo4jGraphWidget:
             return "AND type(rel) IN $relationship_types"
         return ""
 
-    def show_cypher(self, cypher, graph_layout=None, **kwargs):
+    def show_cypher(self, cypher, layout=None, **kwargs):
         """
         main function
         :param cypher: str, Send a data query to the neo4j database
-               **kwargs: variable declarations usable in cypher
+               layout: str, The graph layout for this request. Overwrites the general graph_layout in this specific graph
+                            instance. Allowed values are (one of "circular", "hierarchic", "organic",
+                            "interactive_organic_layout", "orthogonal", "radial", "tree", "map", "orthogonal_edge_router",
+                            "organic_edge_router").
+               **kwargs: Variable declarations usable in cypher
         """
         if self._driver is not None:
             if self._is_autocomplete_enabled():
@@ -108,10 +112,10 @@ class Neo4jGraphWidget:
             self.__apply_edge_mappings(widget)
             self.__apply_heat_mapping({**self._node_configurations, **self._edge_configurations}, widget)
             self.__apply_parent_mapping(widget)
-            if graph_layout is None:
+            if layout is None:
                 widget.set_graph_layout(self._graph_layout)
             else:
-                widget.set_graph_layout(graph_layout)
+                widget.set_graph_layout(layout)
 
             self._widget = widget
             widget.show()
