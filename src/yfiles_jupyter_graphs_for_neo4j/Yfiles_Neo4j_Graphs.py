@@ -117,6 +117,8 @@ class Neo4jGraphWidget:
             else:
                 widget.set_graph_layout(layout)
 
+            widget.node_cell_mapping = self.node_cell_mapping
+
             self._widget = widget
             widget.show()
         else:
@@ -280,3 +282,16 @@ class Neo4jGraphWidget:
         graph = widget if widget is not None else self._widget
         nodes, edges = graph.get_selection()
         return list(map(lambda edge: edge['id'], edges))
+
+    def get_node_cell_mapping(self):
+        return self._node_cell_mapping if hasattr(self, '_node_cell_mapping') else None
+
+    def set_node_cell_mapping(self, node_cell_mapping):
+        # noinspection PyAttributeOutsideInit
+        self._node_cell_mapping = node_cell_mapping
+
+    def del_node_cell_mapping(self):
+        if hasattr(self, '_node_cell_mapping'):
+            delattr(self, '_node_cell_mapping')
+
+    node_cell_mapping = property(get_node_cell_mapping, set_node_cell_mapping, del_node_cell_mapping)
