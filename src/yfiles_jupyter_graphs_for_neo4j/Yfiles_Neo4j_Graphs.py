@@ -137,26 +137,29 @@ class Neo4jGraphWidget:
         def mapping(index, item: Dict):
             label = item["properties"]["label"]  # yjg stores the neo4j node/relationship type in properties["label"]
             if label in configurations and binding_key in configurations.get(label):
+                if binding_key == 'parent_configuration':
+                    # the binding may be a lambda that must be resolved first
+                    binding = configurations.get(label).get(binding_key)
+                    if callable(binding):
+                        binding = configurations.get(label).get(binding_key)(item)
+                    # parent_configuration binding may either resolve to a dict or a string
+                    if isinstance(binding, dict):
+                        group_label = binding.get('text', '')
+                    else:
+                        group_label = binding
+                    result = 'GroupNode' + group_label
                 # mapping
-                if callable(configurations.get(label)[binding_key]):
+                elif callable(configurations.get(label)[binding_key]):
                     result = configurations.get(label)[binding_key](item)
                 # property name
                 elif (not isinstance(configurations.get(label)[binding_key], dict) and
                       configurations.get(label)[binding_key] in item["properties"]):
                     result = item["properties"][configurations.get(label).get(binding_key)]
-                # constant value or dictionary
-                elif binding_key == 'parent_configuration':
-                    if isinstance(configurations.get(label).get(binding_key), dict):
-                        result = configurations.get(label).get(binding_key).get('text', '')
-                    else:
-                        result = configurations.get(label).get(binding_key)
                 # constant value
                 else:
                     result = configurations.get(label).get(binding_key)
-                if binding_key != 'parent_configuration':
-                    return result
-                else:
-                    return 'GroupNode' + str(result)
+
+                return result
 
             if binding_key == "label":
                 return Neo4jGraphWidget.__get_neo4j_item_text(item)
@@ -183,6 +186,10 @@ class Neo4jGraphWidget:
             label = node['properties']['label']
             if label in configurations and key in configurations.get(label):
                 group_node = configurations.get(label).get(key)
+
+                if callable(group_node):
+                    group_node = group_node(node)
+
                 if isinstance(group_node, str):
                     # string or property value
                     if group_node in node["properties"]:
