@@ -66,6 +66,7 @@ The main class `Neo4jGraphWidget` provides the following API:
         - `organic`
         - `interactive_organic_layout`
         - `circular`
+        - `circular_straight_line`
         - `orthogonal`
         - `tree`
         - `radial`
