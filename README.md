@@ -92,6 +92,7 @@ functions:
 
 - `add_node_configuration(label, **kwargs)`
     - `label`: The node label for which this configuration should be used.
+      - `*`: applies to all node types
     - `**kwargs`: Visualization configuration for the given node label. The following arguments are supported:
         - `text`: The text that displayed at the node. By default, the node's label is used.
         - `color`: A convenience color binding for the node (see also `styles` argument).
@@ -107,6 +108,7 @@ functions:
 
 - `add_relationship_configuration(type, **kwargs)`
     - `type`: The relationship type for which this configuration should be used.
+      - `*`: applies to all relationship types
     - `**kwargs`: Visualization configuration for the given relationship type. The following arguments are supported:
         - `text`: The text that displayed at the relationship. By default, the relationship's type is used.
         - `color`: The relationship's color.

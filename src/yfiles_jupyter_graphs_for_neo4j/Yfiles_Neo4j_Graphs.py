@@ -136,12 +136,14 @@ class Neo4jGraphWidget:
     def __configuration_mapper_factory(binding_key, configurations, default_mapping):
         def mapping(index, item: Dict):
             label = item["properties"]["label"]  # yjg stores the neo4j node/relationship type in properties["label"]
-            if label in configurations and binding_key in configurations.get(label):
+            if ((label in configurations or '*' in configurations)
+                    and binding_key in configurations.get(label, configurations.get('*'))):
+                fallback_to_star = configurations.get('*')
                 if binding_key == 'parent_configuration':
                     # the binding may be a lambda that must be resolved first
-                    binding = configurations.get(label).get(binding_key)
+                    binding = configurations.get(label, fallback_to_star).get(binding_key)
                     if callable(binding):
-                        binding = configurations.get(label).get(binding_key)(item)
+                        binding = configurations.get(label, fallback_to_star).get(binding_key)(item)
                     # parent_configuration binding may either resolve to a dict or a string
                     if isinstance(binding, dict):
                         group_label = binding.get('text', '')
@@ -149,15 +151,15 @@ class Neo4jGraphWidget:
                         group_label = binding
                     result = 'GroupNode' + group_label
                 # mapping
-                elif callable(configurations.get(label)[binding_key]):
-                    result = configurations.get(label)[binding_key](item)
+                elif callable(configurations.get(label, fallback_to_star)[binding_key]):
+                    result = configurations.get(label, fallback_to_star)[binding_key](item)
                 # property name
-                elif (not isinstance(configurations.get(label)[binding_key], dict) and
-                      configurations.get(label)[binding_key] in item["properties"]):
-                    result = item["properties"][configurations.get(label).get(binding_key)]
+                elif (not isinstance(configurations.get(label, fallback_to_star)[binding_key], dict) and
+                      configurations.get(label, fallback_to_star)[binding_key] in item["properties"]):
+                    result = item["properties"][configurations.get(label, fallback_to_star).get(binding_key)]
                 # constant value
                 else:
-                    result = configurations.get(label).get(binding_key)
+                    result = configurations.get(label, fallback_to_star).get(binding_key)
 
                 return result
 
