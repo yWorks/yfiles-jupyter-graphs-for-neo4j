@@ -135,6 +135,19 @@ class Neo4jGraphWidget:
 
     @staticmethod
     def __configuration_mapper_factory(binding_key, configurations, default_mapping):
+        """
+        :param binding_key: One of POSSIBLE_NODE_BINDINGS or POSSIBLE_EDGE_BINDINGS
+        :param configurations: All configured node or relationship configurations by the user, keyed by the node label or relationship type.
+            For example, a dictionary built like:
+            {
+              "Movie": { "color": "red", ... },
+              "Person": { "color": "blue", ... },
+              "*": { "color": "gray", ... }
+            }
+        :param default_mapping: A reference to the default binding of the yFiles Graphs for Jupyter core widget that should be used when the binding_key is not specified otherwise.
+        :return: A mapping function that can used in the yFiles Graphs for Jupyter core widget.
+        """
+
         def mapping(index, item: Dict):
             label = item["properties"]["label"]  # yjg stores the neo4j node/relationship type in properties["label"]
             if ((label in configurations or '*' in configurations)
