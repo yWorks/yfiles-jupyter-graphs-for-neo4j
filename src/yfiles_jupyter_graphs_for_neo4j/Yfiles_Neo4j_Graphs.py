@@ -3,6 +3,7 @@
 The main Neo4jGraphWidget class is defined in this module.
 
 """
+from msilib import type_short
 from typing import Dict
 import inspect
 
@@ -138,12 +139,12 @@ class Neo4jGraphWidget:
             label = item["properties"]["label"]  # yjg stores the neo4j node/relationship type in properties["label"]
             if ((label in configurations or '*' in configurations)
                     and binding_key in configurations.get(label, configurations.get('*'))):
-                fallback_to_star = configurations.get('*')
+                type_configuration = configurations.get(label, configurations.get('*'))
                 if binding_key == 'parent_configuration':
                     # the binding may be a lambda that must be resolved first
-                    binding = configurations.get(label, fallback_to_star).get(binding_key)
+                    binding = type_configuration.get(binding_key)
                     if callable(binding):
-                        binding = configurations.get(label, fallback_to_star).get(binding_key)(item)
+                        binding = type_configuration.get(binding_key)(item)
                     # parent_configuration binding may either resolve to a dict or a string
                     if isinstance(binding, dict):
                         group_label = binding.get('text', '')
@@ -151,15 +152,15 @@ class Neo4jGraphWidget:
                         group_label = binding
                     result = 'GroupNode' + group_label
                 # mapping
-                elif callable(configurations.get(label, fallback_to_star)[binding_key]):
-                    result = configurations.get(label, fallback_to_star)[binding_key](item)
+                elif callable(type_configuration[binding_key]):
+                    result = type_configuration[binding_key](item)
                 # property name
-                elif (not isinstance(configurations.get(label, fallback_to_star)[binding_key], dict) and
-                      configurations.get(label, fallback_to_star)[binding_key] in item["properties"]):
-                    result = item["properties"][configurations.get(label, fallback_to_star).get(binding_key)]
+                elif (not isinstance(type_configuration[binding_key], dict) and
+                      type_configuration[binding_key] in item["properties"]):
+                    result = item["properties"][type_configuration.get(binding_key)]
                 # constant value
                 else:
-                    result = configurations.get(label, fallback_to_star).get(binding_key)
+                    result = type_configuration.get(binding_key)
 
                 return result
 
