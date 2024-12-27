@@ -3,10 +3,10 @@
 
 [![PyPI version](https://badge.fury.io/py/yfiles-jupyter-graphs-for-neo4j.svg)](https://badge.fury.io/py/yfiles-jupyter-graphs-for-neo4j)
 
-Easily visualize a [Neo4j](https://neo4j.com/) cypher query as a graph in a Jupyter Notebook.
+Easily visualize a [Neo4j](https://neo4j.com/) Cypher query as a graph in a Jupyter Notebook.
 
 This packages provides an easy-to-use interface to
-the [yFiles Graphs for Jupyter](https://github.com/yWorks/yfiles-jupyter-graphs) widget to directly visualize cypher
+the [yFiles Graphs for Jupyter](https://github.com/yWorks/yfiles-jupyter-graphs) widget to directly visualize Cypher
 queries.
 
 ## Installation
@@ -51,17 +51,18 @@ The main class `Neo4jGraphWidget` provides the following API:
 
 | Argument           | Description                                                                                                                                                                                                                                        | Default   |
 |--------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
-| `driver`           | The neo4j `driver` that is used to execute cypher queries.                                                                                                                                                                                         | `None`    |
+| `driver`           | The neo4j `driver` that is used to execute Cypher queries.                                                                                                                                                                                         | `None`    |
 | `widget_layout`    | Can be used to specify general widget appearance through css attributes. See ipywidget's [`layout`](https://ipywidgets.readthedocs.io/en/stable/examples/Widget%20Layout.html#the-layout-attribute) for more information.                          | `None`    |
 | `overview_enabled` | Enable graph overview component. Default behaviour depends on cell width.                                                                                                                                                                          | `None`    |
+| `context_start_with` | Start with a specific side-panel opened in the interactive widget. Starts with closed side-panel by default.                                                                                                                                                                          | `None`    |
 | `layout`     | Can be used to specify a general default node and edge layout. Available algorithms are: "circular", "hierarchic", "organic", "interactive_organic_layout", "orthogonal", "radial", "tree", "map", "orthogonal_edge_router", "organic_edge_router" | `organic` |
 
 ### Methods 
 
-- `show_cypher(cypher, layout=None, **kwargs)`
-    - `cypher`: The [cypher query](https://neo4j.com/docs/cypher-manual/current/introduction/) that should be
+- `show_cypher(cypher: str, layout: Optional[str] = None, **kwargs: Dict[str, Any]) -> None`
+    - `cypher (str)`: The [Cypher query](https://neo4j.com/docs/cypher-manual/current/introduction/) that should be
       visualized.
-    - `layout`: The graph layout that is used. This overwrites the general layout in this specific graph instance. The following arguments are supported:
+    - `layout (Optional[str])`: The graph layout that is used. This overwrites the general layout in this specific graph instance. The following arguments are supported:
         - `hierarchic`
         - `organic`
         - `interactive_organic_layout`
@@ -73,27 +74,26 @@ The main class `Neo4jGraphWidget` provides the following API:
         - `map`
         - `orthogonal_edge_router`
         - `organic_edge_router`
-    - `**kwargs`: Additional parameters that should be passed to the cypher query (e.g., see
+    - `**kwargs (Dict[str, Any])`: Additional parameters that should be passed to the Cypher query (e.g., see
       the [selection example](https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/selection_example.ipynb)).
 
-The default behavior is to only show the nodes and relationships returned by the cypher query.
+The default behavior is to only show the nodes and relationships returned by the Cypher query.
 This can be changed to autocomplete relationships like in neo4j browser:
-- `set_autocomplete_relationships(autocomplete_relationships)`: Sets whether to autocomplete relationships in the graph or not.
+- `set_autocomplete_relationships(autocomplete_relationships: Union[bool, str, list[str]]) -> None`: Sets whether to autocomplete relationships in the graph or not.
 
-The cypher queries are executed by the provided Neo4j driver. If you have not specified a driver when instantiating the
+The Cypher queries are executed by the provided Neo4j driver. If you have not specified a driver when instantiating the
 class, you can set
 a driver afterward:
 
-- `set_driver(driver)`: Sets the given driver and uses this to send cypher queries to Databases.
-- `get_driver()`: Returns the current driver.
+- `set_driver(driver)`: Sets the Neo4j driver that is used to resolve the Cypher queries.
+- `get_driver()`: Returns the current Neo4j driver.
 
 The graph visualization can be adjusted by adding configurations to each node label or edge type with the following
 functions:
 
-- `add_node_configuration(label, **kwargs)`
-    - `label`: The node label for which this configuration should be used.
-      - `*`: applies to all node types
-    - `**kwargs`: Visualization configuration for the given node label. The following arguments are supported:
+- `add_node_configuration(label: Union[str, list[str]], **kwargs: Dict[str, Any]) -> None`
+    - `label (Union[str, list[str]])`: The node label(s) for which this configuration should be used. Supports `*` to address all labels.
+    - `**kwargs (Dict[str, Any])`: Visualization configuration for the given node label. The following arguments are supported:
         - `text`: The text that displayed at the node. By default, the node's label is used.
         - `color`: A convenience color binding for the node (see also `styles` argument).
         - `size`: The size of the node.
@@ -106,34 +106,33 @@ functions:
         - `parent_configuration`: Configure grouping for this node label. See [grouping.ipynb](https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/grouping.ipynb)
           for examples.
 
-- `add_relationship_configuration(type, **kwargs)`
-    - `type`: The relationship type for which this configuration should be used.
-      - `*`: applies to all relationship types
+- `add_relationship_configuration(type: Union[str, list[str]], **kwargs: Dict[str, Any]) -> None`
+    - `type (Union[str, list[str]])`: The relationship type for which this configuration should be used. Supports `*` to address all types.
     - `**kwargs`: Visualization configuration for the given relationship type. The following arguments are supported:
         - `text`: The text that displayed at the relationship. By default, the relationship's type is used.
         - `color`: The relationship's color.
         - `thickness_factor`: The relationship's stroke thickness factor. By default, `1`.
         - `property`: Allows to specify additional properties on the relationship, which may be bound by other bindings.
 
-- `add_parent_relationship_configuration(type, reverse=False)`
+- `add_parent_relationship_configuration(type: Union[str, list[str]], reverse: Optional[bool] = False) -> None`
     - `type`: The relationship type that should be visualized as node grouping hierarchy instead of the actual relationship.
     - `reverse`: By default the target node is considered as parent. This can be reverted with this argument.
 
 To remove a configuration use the following functions: 
 
-- `del_node_configuration(type)`: Deletes configuration for the given node label.
-- `del_relationship_configurations(type)`: Deletes configuration for the given relationship type.
-- `del_parent_relationship_configuration(type)`: Deletes configuration for the given parent relationship type.
+- `del_node_configuration(label: Union[str, list[str]]) -> None`: Deletes configuration for the given node label(s). Supports `*` to address all types.
+- `del_relationship_configurations(type: Union[str, list[str]]) -> None`: Deletes configuration for the given relationship type(s). Supports `*` to address all labels.
+- `del_parent_relationship_configuration(type: Union[str, list[str]]) -> None`: Deletes configuration for the given parent relationship type(s).
 
-You can select nodes and relationships to retrieve their ids. For example, you can use these ids in new cypher queries
+You can select nodes and relationships to retrieve their ids. For example, you can use these ids in new Cypher queries
 by providing them as parameter to `show_cypher` as shown in
 the [selection example](https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/selection_example.ipynb).
 
-- `get_selected_node_ids(widget=None)`: Returns an Array of node ids
+- `get_selected_node_ids(widget: Optional[Type["Neo4jGraphWidget"]] = None) -> List[str]`: Returns an Array of node ids
     - `widget`: The widget that is used to select nodes from. If `None` is specified, the most recently shown widget is
       used.
     
-- `get_selected_relationship_ids(widget=None)`: Returns an Array of relationship ids
+- `get_selected_relationship_ids(widget: Optional[Type["Neo4jGraphWidget"]] = None) -> List[str]`: Returns an Array of relationship ids
     - `widget`: The widget that is used to select edges from. If `None` is specified, the most recently shown widget is
       used.
 
