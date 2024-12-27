@@ -34,13 +34,14 @@ class Neo4jGraphWidget:
             widget_layout (Optional[ipywidgets.Layout]): Can be used to specify general widget appearance through css attributes.
                 See ipywidgets documentation for the available keywords.
             overview_enabled (Optional[bool]): Whether the graph overview is enabled or not.
-            context_start_with (Optional[str]): Start with a specific side-panel opened in the interactive widget.
+            context_start_with (Optional[str]): Start with a specific side-panel opened in the interactive widget. Starts with closed side-panel by default.
             license (Optional[Dict]): The widget works on common public domains without a specific license.
                 For unknown domains, a license can be obtained by the creators of the widget.
             autocomplete_relationships (Optional[bool]): Whether missing relationships in the Cypher's return value are automatically added.
             layout (Optional[str]): Specifies the default automatic graph arrangement. Can be overwritten for each
                 cypher separately. By default, an "organic" layout is used. Supported values are:
                     - "circular"
+                    - "circular_straight_line"
                     - "hierarchic"
                     - "organic"
                     - "interactive_organic_layout"
@@ -79,7 +80,7 @@ class Neo4jGraphWidget:
         self._driver = driver
         self._session = driver.session()
 
-    def get_driver(self):
+    def get_driver(self) -> Any:
         """
         Gets the configured Neo4j driver.
 
@@ -129,6 +130,7 @@ class Neo4jGraphWidget:
             layout (Optional[str]): The graph layout for this request. Overwrites the general default `layout` that was
                 specified when initializing the class. Supported values are:
                     - "circular"
+                    - "circular_straight_line"
                     - "hierarchic"
                     - "organic"
                     - "interactive_organic_layout"
@@ -333,8 +335,8 @@ class Neo4jGraphWidget:
         Adds a configuration object for the given node `label`(s).
 
         Args:
-            label (Union[str, list[str]]): The node label(s) for which this configuration should be used.
-            **kwargs (Dict): Visualization configuration for the given node label. The following arguments are supported:
+            label (Union[str, list[str]]): The node label(s) for which this configuration should be used. Supports `*` to address all labels.
+            **kwargs (Dict[str, Any]): Visualization configuration for the given node label. The following arguments are supported:
 
                 - `text` (Union[str, Callable]): The text to be displayed on the node. By default, the node's label is used.
                 - `color` (Union[str, Callable]): A convenience color binding for the node (see also styles kwarg).
@@ -367,7 +369,7 @@ class Neo4jGraphWidget:
         Adds a configuration object for the given relationship `type`(s).
 
         Args:
-            type (Union[str, list[str]]): The relationship type(s) for which this configuration should be used.
+            type (Union[str, list[str]]): The relationship type(s) for which this configuration should be used. Supports `*` to address all labels.
             **kwargs (Dict): Visualization configuration for the given node label. The following arguments are supported:
 
                 - `text` (Union[str, Callable]): The text to be displayed on the node.  By default, the relationship's type is used.
@@ -393,7 +395,7 @@ class Neo4jGraphWidget:
             self._edge_configurations[type] = cloned_config
 
     # noinspection PyShadowingBuiltins
-    def add_parent_relationship_configuration(self, type: Union[str, list[str]], reverse=False) -> None:
+    def add_parent_relationship_configuration(self, type: Union[str, list[str]], reverse: Optional[bool] = False) -> None:
         """
         Configure specific relationship types to visualize as nested hierarchies. This removes these relationships from
         the graph and instead groups the related nodes (source and target) as parent-child.
@@ -417,7 +419,7 @@ class Neo4jGraphWidget:
         Deletes the configuration object for the given node `label`(s).
 
         Args:
-            label (Union[str, list[str]]): The node label(s) for which the configuration should be deleted.
+            label (Union[str, list[str]]): The node label(s) for which the configuration should be deleted. Supports `*` to address all labels.
 
         Returns:
             None
@@ -434,7 +436,7 @@ class Neo4jGraphWidget:
         Deletes the configuration object for the given relationship `type`(s).
 
         Args:
-            type (Union[str, list[str]]): The relationship type(s) for which the configuration should be deleted.
+            type (Union[str, list[str]]): The relationship type(s) for which the configuration should be deleted. Supports `*` to address all types.
 
         Returns:
             None
@@ -447,6 +449,8 @@ class Neo4jGraphWidget:
 
     @staticmethod
     def __safe_delete_configuration(key: str, configurations: Dict[str, Any]) -> None:
+        if key == "*":
+            configurations.clear()
         if key in configurations:
             del configurations[key]
 
@@ -470,7 +474,7 @@ class Neo4jGraphWidget:
                 rel_type for rel_type in self._parent_configurations if rel_type[0] != type
             }
 
-    def get_selected_node_ids(self, widget: Optional[Type["Neo4jGraphWidget"]]=None) -> List[str]:
+    def get_selected_node_ids(self, widget: Optional[Type["Neo4jGraphWidget"]] = None) -> List[str]:
         """
         Returns the list of node ids that are currently selected in the most recently shown widget, or in the given `widget`.
 
@@ -485,7 +489,7 @@ class Neo4jGraphWidget:
         nodes, edges = graph.get_selection()
         return list(map(lambda node: node['id'], nodes))
 
-    def get_selected_relationship_ids(self, widget: Optional[Type["Neo4jGraphWidget"]]=None) -> List[str]:
+    def get_selected_relationship_ids(self, widget: Optional[Type["Neo4jGraphWidget"]] = None) -> List[str]:
         """
         Returns the list of relationship ids that are currently selected in the most recently shown widget, or in the given `widget`.
 
