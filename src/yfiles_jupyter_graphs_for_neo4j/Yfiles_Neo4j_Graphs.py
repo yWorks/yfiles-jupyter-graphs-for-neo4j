@@ -328,12 +328,12 @@ class Neo4jGraphWidget:
             setattr(widget, f"_edge_{key}_mapping",
                     Neo4jGraphWidget.__configuration_mapper_factory(key, self._edge_configurations, default_mapping))
 
-    def add_node_configuration(self, label: str, **kwargs: Dict[str, Any]) -> None:
+    def add_node_configuration(self, label: Union[str, list[str]], **kwargs: Dict[str, Any]) -> None:
         """
-        Adds a configuration object for the given node `label`.
+        Adds a configuration object for the given node `label`(s).
 
         Args:
-            label (str): The node label for which this configuration should be used.
+            label (Union[str, list[str]]): The node label(s) for which this configuration should be used.
             **kwargs (Dict): Visualization configuration for the given node label. The following arguments are supported:
 
                 - `text` (Union[str, Callable]): The text to be displayed on the node. By default, the node's label is used.
@@ -353,15 +353,21 @@ class Neo4jGraphWidget:
         config = kwargs
         if text_binding is not None:
             config["label"] = text_binding
-        self._node_configurations[label] = {key: value for key, value in config.items()}
+
+        cloned_config = {key: value for key, value in config.items()}
+        if isinstance(label, list):
+            for l in label:
+                self._node_configurations[l] = cloned_config
+        else:
+            self._node_configurations[label] = cloned_config
 
     # noinspection PyShadowingBuiltins
-    def add_relationship_configuration(self, type: str, **kwargs: Dict[str, Any]) -> None:
+    def add_relationship_configuration(self, type: Union[str, list[str]], **kwargs: Dict[str, Any]) -> None:
         """
-        Adds a configuration object for the given node `label`.
+        Adds a configuration object for the given relationship `type`(s).
 
         Args:
-            type (str): The relationship type for which this configuration should be used.
+            type (Union[str, list[str]]): The relationship type(s) for which this configuration should be used.
             **kwargs (Dict): Visualization configuration for the given node label. The following arguments are supported:
 
                 - `text` (Union[str, Callable]): The text to be displayed on the node.  By default, the relationship's type is used.
@@ -378,65 +384,91 @@ class Neo4jGraphWidget:
         config = kwargs
         if text_binding is not None:
             config["label"] = text_binding
-        self._edge_configurations[type] = {key: value for key, value in config.items()}
+
+        cloned_config = {key: value for key, value in config.items()}
+        if isinstance(type, list):
+            for t in type:
+                self._edge_configurations[t] = cloned_config
+        else:
+            self._edge_configurations[type] = cloned_config
 
     # noinspection PyShadowingBuiltins
-    def add_parent_relationship_configuration(self, type: str, reverse=False) -> None:
+    def add_parent_relationship_configuration(self, type: Union[str, list[str]], reverse=False) -> None:
         """
         Configure specific relationship types to visualize as nested hierarchies. This removes these relationships from
         the graph and instead groups the related nodes (source and target) as parent-child.
 
         Args:
-            type (str): The relationship type that should be visualized as node grouping hierarchy instead of the actual relationship.
+            type (Union[str, list[str]]): The relationship type(s) that should be visualized as node grouping hierarchy instead of the actual relationship.
             reverse (bool): Which node should be considered as parent. By default, the target node is considered as parent which can be reverted with this argument.
 
         Returns:
             None
         """
-        self._parent_configurations.add((type, reverse))
+        if isinstance(type, list):
+            for t in type:
+                self._parent_configurations.add((t, reverse))
+        else:
+            self._parent_configurations.add((type, reverse))
 
     # noinspection PyShadowingBuiltins
-    def del_node_configuration(self, type: str) -> None:
+    def del_node_configuration(self, label: Union[str, list[str]]) -> None:
         """
-        Deletes the configuration object for the given node `label`.
+        Deletes the configuration object for the given node `label`(s).
 
         Args:
-            type (str): The node label for which the configuration should be deleted.
+            label (Union[str, list[str]]): The node label(s) for which the configuration should be deleted.
 
         Returns:
             None
         """
-        if type in self._node_configurations:
-            del self._node_configurations[type]
+        if isinstance(label, list):
+            for l in label:
+                Neo4jGraphWidget.__safe_delete_configuration(l, self._node_configurations)
+        else:
+            Neo4jGraphWidget.__safe_delete_configuration(label, self._node_configurations)
 
     # noinspection PyShadowingBuiltins
-    def del_relationship_configuration(self, type: str) -> None:
+    def del_relationship_configuration(self, type: Union[str, list[str]]) -> None:
         """
-        Deletes the configuration object for the given relationship `type`.
+        Deletes the configuration object for the given relationship `type`(s).
 
         Args:
-            type (str): The relationship type for which the configuration should be deleted.
+            type (Union[str, list[str]]): The relationship type(s) for which the configuration should be deleted.
 
         Returns:
             None
         """
-        if type in self._edge_configurations:
-            del self._edge_configurations[type]
+        if isinstance(type, list):
+            for t in type:
+                Neo4jGraphWidget.__safe_delete_configuration(t, self._edge_configurations)
+        else:
+            Neo4jGraphWidget.__safe_delete_configuration(type, self._edge_configurations)
+
+    @staticmethod
+    def __safe_delete_configuration(key: str, configurations: Dict[str, Any]) -> None:
+        if key in configurations:
+            del configurations[key]
 
     # noinspection PyShadowingBuiltins
-    def del_parent_relationship_configuration(self, type: str) -> None:
+    def del_parent_relationship_configuration(self, type: Union[str, list[str]]) -> None:
         """
-        Deletes the relationship configuration for the given `type`.
+        Deletes the relationship configuration for the given `type`(s).
 
         Args:
-            type (str): The relationship type for which the configuration should be deleted.
+            type (Union[str, list[str]]): The relationship type(s) for which the configuration should be deleted.
 
         Returns:
             None
         """
-        self._parent_configurations = {
-            rel_type for rel_type in self._parent_configurations if rel_type[0] != type
-        }
+        if isinstance(type, list):
+            self._parent_configurations = {
+                rel_type for rel_type in self._parent_configurations if rel_type[0] not in type
+            }
+        else:
+            self._parent_configurations = {
+                rel_type for rel_type in self._parent_configurations if rel_type[0] != type
+            }
 
     def get_selected_node_ids(self, widget: Optional[Type["Neo4jGraphWidget"]]=None) -> List[str]:
         """
