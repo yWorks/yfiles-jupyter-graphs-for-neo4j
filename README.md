@@ -112,6 +112,7 @@ functions:
         - `text`: The text that displayed at the relationship. By default, the relationship's type is used.
         - `color`: The relationship's color.
         - `thickness_factor`: The relationship's stroke thickness factor. By default, `1`.
+        - `styles`: The style of the edge.
         - `property`: Allows to specify additional properties on the relationship, which may be bound by other bindings.
 
 - `add_parent_relationship_configuration(type: Union[str, list[str]], reverse: Optional[bool] = False) -> None`
