@@ -55,7 +55,7 @@ The main class `Neo4jGraphWidget` provides the following API:
 | `widget_layout`    | Can be used to specify general widget appearance through css attributes. See ipywidget's [`layout`](https://ipywidgets.readthedocs.io/en/stable/examples/Widget%20Layout.html#the-layout-attribute) for more information.                          | `None`    |
 | `overview_enabled` | Enable graph overview component. Default behaviour depends on cell width.                                                                                                                                                                          | `None`    |
 | `context_start_with` | Start with a specific side-panel opened in the interactive widget. Starts with closed side-panel by default.                                                                                                                                                                          | `None`    |
-| `layout`     | Can be used to specify a general default node and edge layout. Available algorithms are: "circular", "hierarchic", "organic", "interactive_organic_layout", "orthogonal", "radial", "tree", "map", "orthogonal_edge_router", "organic_edge_router" | `organic` |
+| `layout`     | Can be used to specify a general default node and edge layout. Available algorithms are: "circular", "hierarchic", "organic", "interactive_organic", "orthogonal", "radial", "tree", "map", "orthogonal_edge_router", "organic_edge_router" | `organic` |
 
 ### Methods 
 
@@ -65,7 +65,7 @@ The main class `Neo4jGraphWidget` provides the following API:
     - `layout (Optional[str])`: The graph layout that is used. This overwrites the general layout in this specific graph instance. The following arguments are supported:
         - `hierarchic`
         - `organic`
-        - `interactive_organic_layout`
+        - `interactive_organic`
         - `circular`
         - `circular_straight_line`
         - `orthogonal`
