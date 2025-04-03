@@ -1,6 +1,6 @@
 [project]
 name = "yfiles_jupyter_graphs_for_neo4j"
-version = "1.6.0"
+version = "1.7.0"
 authors = [
   {name = "yWorks Support Team", email= "yfileshtml@yworks.com"},
 ]
