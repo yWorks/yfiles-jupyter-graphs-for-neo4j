@@ -77,16 +77,28 @@ The main class `Neo4jGraphWidget` provides the following API:
     - `**kwargs (Dict[str, Any])`: Additional parameters that should be passed to the Cypher query (e.g., see
       the [selection example](https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/selection_example.ipynb)).
 
-The default behavior is to only show the nodes and relationships returned by the Cypher query.
-This can be changed to autocomplete relationships like in neo4j browser:
-- `set_autocomplete_relationships(autocomplete_relationships: Union[bool, str, list[str]]) -> None`: Sets whether to autocomplete relationships in the graph or not.
+### Properties
 
-The Cypher queries are executed by the provided Neo4j driver. If you have not specified a driver when instantiating the
-class, you can set
-a driver afterward:
+The following properties can be read and assigned after creating the widget:
 
-- `set_driver(driver)`: Sets the Neo4j driver that is used to resolve the Cypher queries.
-- `get_driver()`: Returns the current Neo4j driver.
+- `driver`: The Neo4j driver that is used to resolve Cypher queries. Assign a new driver with `widget.driver = driver`.
+- `autocomplete_relationships`: Controls relationship autocompletion. Set it to `True` or `False` to enable or disable
+  autocompletion for all relationships, or set it to a relationship type (`str`) or a list of relationship types
+  (`list[str]`) to enable it for specific relationships.
+- `node_cell_mapping`: An optional `str` or callable that maps nodes to row, column tuples for fine-tuning automatic
+  layout algorithms. Assign `None` to remove the mapping.
+
+The default behavior is to only show the nodes and relationships returned by the Cypher query. To autocomplete
+relationships like in Neo4j Browser:
+
+```python
+widget.autocomplete_relationships = True
+widget.driver = driver
+```
+
+The legacy methods `set_autocomplete_relationships()`, `set_driver()`, `get_driver()`, `get_node_cell_mapping()`,
+`set_node_cell_mapping()`, and `del_node_cell_mapping()` remain available for backwards compatibility, but are
+deprecated. Use the properties above instead.
 
 The graph visualization can be adjusted by adding configurations to each node label or edge type with the following
 functions:

@@ -3,6 +3,7 @@
 The main Neo4jGraphWidget class is defined in this module.
 
 """
+import warnings
 from typing import Any, Callable, Dict, Union, Type, Optional, List
 from yfiles_jupyter_graphs import GraphWidget
 
@@ -51,20 +52,27 @@ class Neo4jGraphWidget:
         """
 
         self._widget = GraphWidget()
-        self._driver = driver
-        self._session = driver.session()
+        self.driver = driver
         self._license = license
         self._overview = overview_enabled
         self._layout = widget_layout
         self._context_start_with = context_start_with
-        self.set_autocomplete_relationships(autocomplete_relationships)
+        self.autocomplete_relationships = autocomplete_relationships
         self._graph_layout = layout
 
         self._node_configurations = {}
         self._edge_configurations = {}
         self._parent_configurations = set()
 
-    def set_driver(self, driver: Any) -> None:
+    # region driver
+
+    @property
+    def driver(self) -> Any:
+        """The Neo4j driver that is used to resolve the Cypher queries."""
+        return self._driver
+
+    @driver.setter
+    def driver(self, driver: Any) -> None:
         """
         The Neo4j driver that is used to resolve the Cypher queries. A new session is created when set.
 
@@ -77,16 +85,41 @@ class Neo4jGraphWidget:
         self._driver = driver
         self._session = driver.session()
 
+    def set_driver(self, driver: Any) -> None:
+        """Legacy setter for the driver property.
+
+        Deprecated, use ``widget.driver = value`` instead.
+        """
+        warnings.warn(
+            "set_driver() is deprecated; use `widget.driver = value` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self.driver = driver
+
     def get_driver(self) -> Any:
-        """
-        Gets the configured Neo4j driver.
+        """Legacy getter for the driver property.
 
-        Returns:
-            neo4j._sync.driver.Neo4jDriver
+        Deprecated, use ``widget.driver`` instead.
         """
-        return self._driver
+        warnings.warn(
+            "get_driver() is deprecated; use `widget.driver` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.driver
 
-    def set_autocomplete_relationships(self, autocomplete_relationships: Union[bool, str, list[str]]) -> None:
+    # endregion
+
+    # region autocomplete_relationships
+
+    @property
+    def autocomplete_relationships(self) -> Union[bool, list[str]]:
+        """Whether relationship autocompletion is enabled for all or specific relationship types."""
+        return self._autocomplete_relationships
+
+    @autocomplete_relationships.setter
+    def autocomplete_relationships(self, autocomplete_relationships: Union[bool, str, list[str]]) -> None:
         """
         Sets the flag to enable or disable autocomplete for relationships.
         When autocomplete is enabled, relationships are automatically completed in the graph,
@@ -107,6 +140,20 @@ class Neo4jGraphWidget:
             self._autocomplete_relationships = [autocomplete_relationships]
         else:
             self._autocomplete_relationships = autocomplete_relationships
+
+    def set_autocomplete_relationships(self, autocomplete_relationships: Union[bool, str, list[str]]) -> None:
+        """Legacy setter for the autocomplete relationships property.
+
+        Deprecated, use ``widget.autocomplete_relationships = value`` instead.
+        """
+        warnings.warn(
+            "set_autocomplete_relationships() is deprecated; use `widget.autocomplete_relationships = value` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self.autocomplete_relationships = autocomplete_relationships
+
+    # endregion
 
     def _is_autocomplete_enabled(self) -> bool:
         if isinstance(self._autocomplete_relationships, bool):
@@ -219,6 +266,9 @@ class Neo4jGraphWidget:
                 return str(lowercase_element_props[key])
         return None
 
+    # def __configuration_mapper_factory(binding_key: str, configurations: Dict[str, Dict[str, str]],
+    #                                    default_mapping: Callable) -> Callable[[int, Dict], Union[Dict, str]]:
+
     @staticmethod
     def __configuration_mapper_factory(binding_key: str,
                                        configurations: Dict[str, Dict[str, str]]) -> Optional[
@@ -246,7 +296,7 @@ class Neo4jGraphWidget:
         if not any(binding_key in configuration for configuration in configurations.values()):
             return None
 
-        def mapping(index: int, item: Dict) -> Union[Dict, str]:
+        def mapping(index: int, item: Dict) -> Union[Dict, str, None]:
             label = item["properties"]["label"]  # yjg stores the neo4j node/relationship type in properties["label"]
             if ((label in configurations or "*" in configurations)
                     and binding_key in configurations.get(label, configurations.get("*"))):
@@ -534,22 +584,26 @@ class Neo4jGraphWidget:
         element_ids = getattr(graph, "_neo4j_relationship_element_ids", {})
         return [element_ids.get(edge["id"], edge["id"]) for edge in edges]
 
-    def get_node_cell_mapping(self) -> Union[str, Callable, None]:
+    # region node_cell_mapping
+
+    @property
+    def node_cell_mapping(self) -> Union[str, Callable, None]:
         """
         Returns the currently specified node cell mapping.
 
         Returns:
             Union[str, Callable, None]: The currently specified node cell mapping.
         """
-        return self._node_cell_mapping if hasattr(self, "_node_cell_mapping") else None
+        return getattr(self, "_node_cell_mapping", None)
 
-    def set_node_cell_mapping(self, node_cell_mapping: Union[str, Callable]) -> None:
+    @node_cell_mapping.setter
+    def node_cell_mapping(self, node_cell_mapping: Optional[Union[str, Callable]]) -> None:
         """
         Specify a node to cell mapping to fine-tune automatic layout algorithms. The mapping should resolve to a row,
         column tuple that is used as a cell into which the node is placed.
 
         Args:
-            node_cell_mapping (Union[str, Callable]): Specifies a node to cell mapping. Must resolve to a row, column tuple or None.
+            node_cell_mapping (Optional[Union[str, Callable]]): Specifies a node to cell mapping. Must resolve to a row, column tuple or None.
 
         Returns:
             None
@@ -557,14 +611,45 @@ class Neo4jGraphWidget:
         # noinspection PyAttributeOutsideInit
         self._node_cell_mapping = node_cell_mapping
 
+    @node_cell_mapping.deleter
+    def node_cell_mapping(self) -> None:
+        """Deletes the node cell mapping."""
+        self._node_cell_mapping = None
+
+    def get_node_cell_mapping(self) -> Union[str, Callable, None]:
+        """Legacy getter for the node cell mapping property.
+
+        Deprecated, use ``widget.node_cell_mapping`` instead.
+        """
+        warnings.warn(
+            "get_node_cell_mapping() is deprecated; use `widget.node_cell_mapping` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.node_cell_mapping
+
+    def set_node_cell_mapping(self, node_cell_mapping: Optional[Union[str, Callable]]) -> None:
+        """Legacy setter for the node cell mapping property.
+
+        Deprecated, use ``widget.node_cell_mapping = value`` instead.
+        """
+        warnings.warn(
+            "set_node_cell_mapping() is deprecated; use `widget.node_cell_mapping = value` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self.node_cell_mapping = node_cell_mapping
+
     def del_node_cell_mapping(self) -> None:
-        """
-        Deletes the node cell mapping.
+        """Legacy deleter for the node cell mapping property.
 
-        Returns:
-             None
+        Deprecated, use ``widget.node_cell_mapping = None`` instead.
         """
-        if hasattr(self, "_node_cell_mapping"):
-            delattr(self, "_node_cell_mapping")
+        warnings.warn(
+            "del_node_cell_mapping() is deprecated; use `widget.node_cell_mapping = None` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self.node_cell_mapping = None
 
-    node_cell_mapping = property(get_node_cell_mapping, set_node_cell_mapping, del_node_cell_mapping)
+    # endregion
