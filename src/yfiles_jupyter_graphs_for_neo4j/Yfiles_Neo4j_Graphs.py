@@ -4,9 +4,6 @@ The main Neo4jGraphWidget class is defined in this module.
 
 """
 from typing import Any, Callable, Dict, Union, Type, Optional, List
-from types import FunctionType, MethodType
-import inspect
-
 from yfiles_jupyter_graphs import GraphWidget
 
 # TODO maybe change to get dynamically when adding bindings
@@ -131,7 +128,7 @@ class Neo4jGraphWidget:
                 specified when initializing the class. Supported values are:
                     - "circular"
                     - "circular_straight_line"
-                    - "hierarchic"
+                    - "hierarchical"
                     - "organic"
                     - "interactive_organic"
                     - "orthogonal"
@@ -175,9 +172,9 @@ class Neo4jGraphWidget:
             self.__apply_heat_mapping({**self._node_configurations, **self._edge_configurations}, widget)
             self.__apply_parent_mapping(widget)
             if layout is None:
-                widget.set_graph_layout(self._graph_layout)
+                widget.graph_layout = self._graph_layout
             else:
-                widget.set_graph_layout(layout)
+                widget.graph_layout = layout
 
             widget.node_cell_mapping = self.node_cell_mapping
 
@@ -195,8 +192,9 @@ class Neo4jGraphWidget:
         return None
 
     @staticmethod
-    def __configuration_mapper_factory(binding_key: str, configurations: Dict[str, Dict[str, str]],
-                                       default_mapping: Callable) -> Callable[[int, Dict], Union[Dict, str]]:
+    def __configuration_mapper_factory(binding_key: str,
+                                       configurations: Dict[str, Dict[str, str]]) -> Optional[
+                                           Callable[[int, Dict], Optional[Union[Dict, str]]]]:
         """
         This is called once for each POSSIBLE_NODE_BINDINGS or POSSIBLE_EDGE_BINDINGS (as `binding_key` argument) and
         sets the returned mapping function for the `binding_key` on the core yFiles Graphs for Jupyter widget.
@@ -210,11 +208,15 @@ class Neo4jGraphWidget:
                   "Person": { "color": "blue", ... },
                   "*": { "color": "gray", ... }
                 }
-            default_mapping (MethodType): A reference to the default binding of the yFiles Graphs for Jupyter core widget that should be used when the binding_key is not specified otherwise.
-
         Returns:
-            FunctionType: A mapping function that can used in the yFiles Graphs for Jupyter core widget.
+            Optional[Callable]: A mapping function for the yFiles Graphs for Jupyter core widget, or None to use
+                its default mapping.
         """
+
+        # GraphWidget resolves None to its built-in default mapping. Only install a
+        # custom mapping when this binding is configured by the user.
+        if not any(binding_key in configuration for configuration in configurations.values()):
+            return None
 
         def mapping(index: int, item: Dict) -> Union[Dict, str]:
             label = item["properties"]["label"]  # yjg stores the neo4j node/relationship type in properties["label"]
@@ -248,20 +250,14 @@ class Neo4jGraphWidget:
             if binding_key == "label":
                 return Neo4jGraphWidget.__get_neo4j_item_text(item)
             else:
-                # call default mapping
-                # some default mappings do not support "index" as first parameter
-                parameters = inspect.signature(default_mapping).parameters
-                if len(parameters) > 1 and parameters[list(parameters)[0]].annotation == int:
-                    return default_mapping(index, item)
-                else:
-                    return default_mapping(item)
+                # No custom value is configured for this item.
+                return None
 
         return mapping
 
     def __apply_heat_mapping(self, configuration, widget: GraphWidget) -> None:
-        setattr(widget, "_heat_mapping",
-                Neo4jGraphWidget.__configuration_mapper_factory('heat', configuration,
-                                                                getattr(widget, 'default_heat_mapping')))
+        setattr(widget, "heat_mapping",
+                Neo4jGraphWidget.__configuration_mapper_factory('heat', configuration))
 
     def __create_group_nodes(self, configurations, widget: GraphWidget) -> None:
         group_node_properties = set()
@@ -310,25 +306,25 @@ class Neo4jGraphWidget:
 
         # use list comprehension to filter out the edges to automatically trigger model sync with the frontend
         widget.edges = [edge for edge in widget.edges if edge['id'] not in edge_ids_to_remove]
-        current_parent_mapping = getattr(widget, '_node_parent_mapping')
-        setattr(widget, "_node_parent_mapping",
+        current_parent_mapping = getattr(widget, 'node_parent_mapping', None)
+        if current_parent_mapping is None:
+            current_parent_mapping = lambda index, node: None
+        setattr(widget, "node_parent_mapping",
                 lambda index, node: node_to_parent.get(node['id'], current_parent_mapping(index, node)))
 
     def __apply_node_mappings(self, widget: GraphWidget) -> None:
         for key in POSSIBLE_NODE_BINDINGS:
-            default_mapping = getattr(widget, f"default_node_{key}_mapping")
-            setattr(widget, f"_node_{key}_mapping",
-                    Neo4jGraphWidget.__configuration_mapper_factory(key, self._node_configurations, default_mapping))
+            setattr(widget, f"node_{key}_mapping",
+                    Neo4jGraphWidget.__configuration_mapper_factory(key, self._node_configurations))
         # manually set parent configuration
-        setattr(widget, f"_node_parent_mapping",
+        setattr(widget, "node_parent_mapping",
                 Neo4jGraphWidget.__configuration_mapper_factory('parent_configuration',
-                                                                self._node_configurations, lambda node: None))
+                                                                self._node_configurations))
 
     def __apply_edge_mappings(self, widget: GraphWidget) -> None:
         for key in POSSIBLE_EDGE_BINDINGS:
-            default_mapping = getattr(widget, f"default_edge_{key}_mapping")
-            setattr(widget, f"_edge_{key}_mapping",
-                    Neo4jGraphWidget.__configuration_mapper_factory(key, self._edge_configurations, default_mapping))
+            setattr(widget, f"edge_{key}_mapping",
+                    Neo4jGraphWidget.__configuration_mapper_factory(key, self._edge_configurations))
 
     def add_node_configuration(self, label: Union[str, list[str]], **kwargs: Dict[str, Any]) -> None:
         """
@@ -485,8 +481,10 @@ class Neo4jGraphWidget:
         Returns:
             List[str]: The list of node ids currently selected in the widget.
         """
-        graph = widget if widget is not None else self._widget
-        nodes, edges = graph.get_selection()
+        graph = self._widget
+        if isinstance(widget, Neo4jGraphWidget):
+            graph = widget._widget
+        nodes, edges = graph.selection
         return list(map(lambda node: node['id'], nodes))
 
     def get_selected_relationship_ids(self, widget: Optional[Type["Neo4jGraphWidget"]] = None) -> List[str]:
@@ -500,8 +498,10 @@ class Neo4jGraphWidget:
         Returns:
             List[str]: The list of relationship ids currently selected in the widget.
         """
-        graph = widget if widget is not None else self._widget
-        nodes, edges = graph.get_selection()
+        graph = self._widget
+        if isinstance(widget, Neo4jGraphWidget):
+            graph = widget._widget
+        nodes, edges = graph.selection
         return list(map(lambda edge: edge['id'], edges))
 
     def get_node_cell_mapping(self) -> Union[str, Callable, None]:

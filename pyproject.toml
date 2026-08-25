@@ -1,6 +1,6 @@
 [project]
 name = "yfiles_jupyter_graphs_for_neo4j"
-version = "1.7.0"
+version = "2.0.0"
 authors = [
   {name = "yWorks Support Team", email= "yfileshtml@yworks.com"},
 ]
@@ -22,7 +22,7 @@ classifiers = [
 ]
 license = {file = "LICENSE.md"}
 dependencies = [
-  "yfiles_jupyter_graphs>=1.10.0"
+  "yfiles_jupyter_graphs~=2.0"
 ]
 
 [project.urls]
