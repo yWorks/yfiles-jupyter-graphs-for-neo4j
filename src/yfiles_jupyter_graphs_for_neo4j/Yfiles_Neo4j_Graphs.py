@@ -118,7 +118,7 @@ class Neo4jGraphWidget:
             return "AND type(rel) IN $relationship_types"
         return ""
 
-    def show_cypher(self, cypher: str, layout: Optional[str] = None, **kwargs: Dict[str, Any]) -> None:
+    def show_cypher(self, cypher: str, layout: Optional[str] = None, **kwargs: Any) -> None:
         """
         Displays the given Cypher query as interactive graph.
 
@@ -137,7 +137,7 @@ class Neo4jGraphWidget:
                     - "map"
                     - "orthogonal_edge_router"
                     - "organic_edge_router"
-            **kwargs (Dict[str, Any]): Additional parameters that should be passed to the Cypher query.
+            **kwargs (Any): Additional parameters that should be passed to the Cypher query.
 
         Returns:
             None
@@ -148,7 +148,7 @@ class Neo4jGraphWidget:
         if self._driver is not None:
             if self._is_autocomplete_enabled():
                 nodes = self._session.run(cypher, **kwargs).graph().nodes
-                node_ids = [node.element_id for node in nodes]
+                node_ids = [Neo4jGraphWidget.__get_neo4j_element_id(node) for node in nodes]
                 reltypes_expr = self._get_relationship_types_expression()
                 cypher = f"""
                     MATCH (n) WHERE elementId(n) IN $node_ids
@@ -163,9 +163,11 @@ class Neo4jGraphWidget:
                 kwargs = {"node_ids": node_ids}
                 if reltypes_expr:
                     kwargs["relationship_types"] = self._autocomplete_relationships
+            graph = self._session.run(cypher, **kwargs).graph()
             widget = GraphWidget(overview_enabled=self._overview, context_start_with=self._context_start_with,
                                  widget_layout=self._layout, license=self._license,
-                                 graph=self._session.run(cypher, **kwargs).graph())
+                                 graph=graph)
+            self.__remember_neo4j_element_ids(widget, graph)
             self.__create_group_nodes(self._node_configurations, widget)
             self.__apply_node_mappings(widget)
             self.__apply_edge_mappings(widget)
@@ -182,6 +184,32 @@ class Neo4jGraphWidget:
             widget.show()
         else:
             raise Exception("no driver specified")
+
+    @staticmethod
+    def __get_neo4j_element_id(element: Any) -> Any:
+        """Get the stable Neo4j element ID, with a fallback for older drivers."""
+        element_id = getattr(element, 'element_id', None)
+        if element_id is not None:
+            return element_id
+        return element.id
+
+    @staticmethod
+    def __remember_neo4j_element_ids(widget: GraphWidget, graph: Any) -> None:
+        """Keep Neo4j element IDs alongside the core widget's internal graph IDs.
+
+        yFiles Graphs for Jupyter currently uses ``Node.id`` and ``Relationship.id``
+        as its graph keys. Those IDs are not the values expected by Cypher's
+        ``elementId`` function, so selection helpers need a mapping back to the
+        original Neo4j entities.
+        """
+        setattr(widget, '_neo4j_node_element_ids', {
+            node.id: Neo4jGraphWidget.__get_neo4j_element_id(node)
+            for node in graph.nodes
+        })
+        setattr(widget, '_neo4j_relationship_element_ids', {
+            relationship.id: Neo4jGraphWidget.__get_neo4j_element_id(relationship)
+            for relationship in getattr(graph, 'relationships', ())
+        })
 
     @staticmethod
     def __get_neo4j_item_text(element: Dict) -> Union[str, None]:
@@ -470,7 +498,7 @@ class Neo4jGraphWidget:
                 rel_type for rel_type in self._parent_configurations if rel_type[0] != type
             }
 
-    def get_selected_node_ids(self, widget: Optional[Type["Neo4jGraphWidget"]] = None) -> List[str]:
+    def get_selected_node_ids(self, widget: Optional[Type["Neo4jGraphWidget"]] = None) -> List[Any | None]:
         """
         Returns the list of node ids that are currently selected in the most recently shown widget, or in the given `widget`.
 
@@ -479,15 +507,16 @@ class Neo4jGraphWidget:
                 If not specified, the most recently shown widget will be used.
 
         Returns:
-            List[str]: The list of node ids currently selected in the widget.
+            List[Any | None]: The list of selected Neo4j element IDs.
         """
         graph = self._widget
         if isinstance(widget, Neo4jGraphWidget):
             graph = widget._widget
         nodes, edges = graph.selection
-        return list(map(lambda node: node['id'], nodes))
+        element_ids = getattr(graph, '_neo4j_node_element_ids', {})
+        return [element_ids.get(node['id'], node['id']) for node in nodes]
 
-    def get_selected_relationship_ids(self, widget: Optional[Type["Neo4jGraphWidget"]] = None) -> List[str]:
+    def get_selected_relationship_ids(self, widget: Optional[Type["Neo4jGraphWidget"]] = None) -> List[Any | None]:
         """
         Returns the list of relationship ids that are currently selected in the most recently shown widget, or in the given `widget`.
 
@@ -496,13 +525,14 @@ class Neo4jGraphWidget:
                 If not specified, the most recently shown widget will be used.
 
         Returns:
-            List[str]: The list of relationship ids currently selected in the widget.
+            List[Any | None]: The list of selected Neo4j relationship element IDs.
         """
         graph = self._widget
         if isinstance(widget, Neo4jGraphWidget):
             graph = widget._widget
         nodes, edges = graph.selection
-        return list(map(lambda edge: edge['id'], edges))
+        element_ids = getattr(graph, '_neo4j_relationship_element_ids', {})
+        return [element_ids.get(edge['id'], edge['id']) for edge in edges]
 
     def get_node_cell_mapping(self) -> Union[str, Callable, None]:
         """

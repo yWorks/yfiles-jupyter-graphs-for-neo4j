@@ -125,15 +125,15 @@ To remove a configuration use the following functions:
 - `del_relationship_configurations(type: Union[str, list[str]]) -> None`: Deletes configuration for the given relationship type(s). Supports `*` to address all labels.
 - `del_parent_relationship_configuration(type: Union[str, list[str]]) -> None`: Deletes configuration for the given parent relationship type(s).
 
-You can select nodes and relationships to retrieve their ids. For example, you can use these ids in new Cypher queries
-by providing them as parameter to `show_cypher` as shown in
+You can select nodes and relationships to retrieve their Neo4j element ids. For example, you can use these ids in new
+Cypher queries with `elementId` by providing them as a parameter to `show_cypher`, as shown in
 the [selection example](https://github.com/yWorks/yfiles-jupyter-graphs-for-neo4j/blob/main/examples/selection_example.ipynb).
 
-- `get_selected_node_ids(widget: Optional[Type["Neo4jGraphWidget"]] = None) -> List[str]`: Returns an Array of node ids
+- `get_selected_node_ids(widget: Optional[Type["Neo4jGraphWidget"]] = None) -> List[str]`: Returns an Array of Neo4j element ids
     - `widget`: The widget that is used to select nodes from. If `None` is specified, the most recently shown widget is
       used.
     
-- `get_selected_relationship_ids(widget: Optional[Type["Neo4jGraphWidget"]] = None) -> List[str]`: Returns an Array of relationship ids
+- `get_selected_relationship_ids(widget: Optional[Type["Neo4jGraphWidget"]] = None) -> List[str]`: Returns an Array of Neo4j relationship element ids
     - `widget`: The widget that is used to select edges from. If `None` is specified, the most recently shown widget is
       used.
 
