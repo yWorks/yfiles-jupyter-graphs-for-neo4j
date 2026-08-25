@@ -8,10 +8,10 @@ from yfiles_jupyter_graphs import GraphWidget
 
 # TODO maybe change to get dynamically when adding bindings
 
-POSSIBLE_NODE_BINDINGS = {'coordinate', 'color', 'size', 'type', 'styles', 'scale_factor', 'position',
-                          'layout', 'property', 'label'}
-POSSIBLE_EDGE_BINDINGS = {'color', 'thickness_factor', 'styles', 'property', 'label'}
-NEO4J_LABEL_KEYS = ['name', 'title', 'text', 'description', 'caption', 'label']
+POSSIBLE_NODE_BINDINGS = {"coordinate", "color", "size", "type", "styles", "scale_factor", "position",
+                          "layout", "property", "label"}
+POSSIBLE_EDGE_BINDINGS = {"color", "thickness_factor", "styles", "property", "label"}
+NEO4J_LABEL_KEYS = ["name", "title", "text", "description", "caption", "label"]
 
 class Neo4jGraphWidget:
     """
@@ -22,7 +22,7 @@ class Neo4jGraphWidget:
     def __init__(self, driver: Optional[Any] = None, widget_layout: Optional[Any] = None,
                  overview_enabled: Optional[bool] = None, context_start_with: Optional[str] = None,
                  license: Optional[Dict] = None,
-                 autocomplete_relationships: Optional[bool] = False, layout: Optional[str] = 'organic'):
+                 autocomplete_relationships: Optional[bool] = False, layout: Optional[str] = "organic"):
         """
         Initializes a new instance of the Neo4jGraphWidget class.
 
@@ -188,7 +188,7 @@ class Neo4jGraphWidget:
     @staticmethod
     def __get_neo4j_element_id(element: Any) -> Any:
         """Get the stable Neo4j element ID, with a fallback for older drivers."""
-        element_id = getattr(element, 'element_id', None)
+        element_id = getattr(element, "element_id", None)
         if element_id is not None:
             return element_id
         return element.id
@@ -202,18 +202,18 @@ class Neo4jGraphWidget:
         ``elementId`` function, so selection helpers need a mapping back to the
         original Neo4j entities.
         """
-        setattr(widget, '_neo4j_node_element_ids', {
+        setattr(widget, "_neo4j_node_element_ids", {
             node.id: Neo4jGraphWidget.__get_neo4j_element_id(node)
             for node in graph.nodes
         })
-        setattr(widget, '_neo4j_relationship_element_ids', {
+        setattr(widget, "_neo4j_relationship_element_ids", {
             relationship.id: Neo4jGraphWidget.__get_neo4j_element_id(relationship)
-            for relationship in getattr(graph, 'relationships', ())
+            for relationship in getattr(graph, "relationships", ())
         })
 
     @staticmethod
     def __get_neo4j_item_text(element: Dict) -> Union[str, None]:
-        lowercase_element_props = {key.lower(): value for key, value in element.get('properties', {}).items()}
+        lowercase_element_props = {key.lower(): value for key, value in element.get("properties", {}).items()}
         for key in NEO4J_LABEL_KEYS:
             if key in lowercase_element_props:
                 return str(lowercase_element_props[key])
@@ -248,20 +248,20 @@ class Neo4jGraphWidget:
 
         def mapping(index: int, item: Dict) -> Union[Dict, str]:
             label = item["properties"]["label"]  # yjg stores the neo4j node/relationship type in properties["label"]
-            if ((label in configurations or '*' in configurations)
-                    and binding_key in configurations.get(label, configurations.get('*'))):
-                type_configuration = configurations.get(label, configurations.get('*'))
-                if binding_key == 'parent_configuration':
+            if ((label in configurations or "*" in configurations)
+                    and binding_key in configurations.get(label, configurations.get("*"))):
+                type_configuration = configurations.get(label, configurations.get("*"))
+                if binding_key == "parent_configuration":
                     # the binding may be a lambda that must be resolved first
                     binding = type_configuration.get(binding_key)
                     if callable(binding):
                         binding = binding(item)
                     # parent_configuration binding may either resolve to a dict or a string
                     if isinstance(binding, dict):
-                        group_label = binding.get('text', '')
+                        group_label = binding.get("text", "")
                     else:
                         group_label = binding
-                    result = 'GroupNode' + group_label
+                    result = "GroupNode" + group_label
                 # mapping
                 elif callable(type_configuration[binding_key]):
                     result = type_configuration[binding_key](item)
@@ -285,14 +285,14 @@ class Neo4jGraphWidget:
 
     def __apply_heat_mapping(self, configuration, widget: GraphWidget) -> None:
         setattr(widget, "heat_mapping",
-                Neo4jGraphWidget.__configuration_mapper_factory('heat', configuration))
+                Neo4jGraphWidget.__configuration_mapper_factory("heat", configuration))
 
     def __create_group_nodes(self, configurations, widget: GraphWidget) -> None:
         group_node_properties = set()
         group_node_values = set()
-        key = 'parent_configuration'
+        key = "parent_configuration"
         for node in widget.nodes:
-            label = node['properties']['label']
+            label = node["properties"]["label"]
             if label in configurations and key in configurations.get(label):
                 group_node = configurations.get(label).get(key)
 
@@ -307,13 +307,13 @@ class Neo4jGraphWidget:
                         group_node_values.add(group_node)
                 else:
                     # dictionary with values
-                    text = group_node.get('text', '')
+                    text = group_node.get("text", "")
                     group_node_values.add(text)
-                    configuration = {k: v for k, v in group_node.items() if k != 'text'}
+                    configuration = {k: v for k, v in group_node.items() if k != "text"}
                     self.add_node_configuration(text, **configuration)
 
         for group_label in group_node_properties.union(group_node_values):
-            node = {'id': 'GroupNode' + group_label, 'properties': {'label': group_label}}
+            node = {"id": "GroupNode" + group_label, "properties": {"label": group_label}}
             widget.nodes = [*widget.nodes, node]
 
     def __apply_parent_mapping(self, widget: GraphWidget) -> None:
@@ -323,22 +323,22 @@ class Neo4jGraphWidget:
             rel_type = edge["properties"]["label"]
             for (parent_type, is_reversed) in self._parent_configurations:
                 if rel_type == parent_type:
-                    start = edge['start']  # child node id
-                    end = edge['end']  # parent node id
+                    start = edge["start"]  # child node id
+                    end = edge["end"]  # parent node id
                     if is_reversed:
                         node_to_parent[end] = start
                     else:
                         node_to_parent[start] = end
-                    edge_ids_to_remove.add(edge['id'])
+                    edge_ids_to_remove.add(edge["id"])
                     break
 
         # use list comprehension to filter out the edges to automatically trigger model sync with the frontend
-        widget.edges = [edge for edge in widget.edges if edge['id'] not in edge_ids_to_remove]
-        current_parent_mapping = getattr(widget, 'node_parent_mapping', None)
+        widget.edges = [edge for edge in widget.edges if edge["id"] not in edge_ids_to_remove]
+        current_parent_mapping = getattr(widget, "node_parent_mapping", None)
         if current_parent_mapping is None:
             current_parent_mapping = lambda index, node: None
         setattr(widget, "node_parent_mapping",
-                lambda index, node: node_to_parent.get(node['id'], current_parent_mapping(index, node)))
+                lambda index, node: node_to_parent.get(node["id"], current_parent_mapping(index, node)))
 
     def __apply_node_mappings(self, widget: GraphWidget) -> None:
         for key in POSSIBLE_NODE_BINDINGS:
@@ -346,7 +346,7 @@ class Neo4jGraphWidget:
                     Neo4jGraphWidget.__configuration_mapper_factory(key, self._node_configurations))
         # manually set parent configuration
         setattr(widget, "node_parent_mapping",
-                Neo4jGraphWidget.__configuration_mapper_factory('parent_configuration',
+                Neo4jGraphWidget.__configuration_mapper_factory("parent_configuration",
                                                                 self._node_configurations))
 
     def __apply_edge_mappings(self, widget: GraphWidget) -> None:
@@ -365,7 +365,7 @@ class Neo4jGraphWidget:
                 - `text` (Union[str, Callable]): The text to be displayed on the node. By default, the node's label is used.
                 - `color` (Union[str, Callable]): A convenience color binding for the node (see also styles kwarg).
                 - `size` (Union[str, Callable]): The size of the node.
-                - `styles` (Union[Dict, Callable]): A dictionary that may contain the following attributes color, shape (one of 'ellipse', ' hexagon', 'hexagon2', 'octagon', 'pill', 'rectangle', 'round-rectangle' or 'triangle'), image.
+                - `styles` (Union[Dict, Callable]): A dictionary that may contain the following attributes color, shape (one of "ellipse", " hexagon", "hexagon2", "octagon", "pill", "rectangle", "round-rectangle" or "triangle"), image.
                 - `property` (Union[Dict, Callable]): Allows to specify additional properties on the node, which may be bound by other bindings.
                 - `type` (Union[Dict, Callable]): Defines a specific "type" for the node which affects the automatic positioning of nodes (same "type"s are preferred to be placed next to each other).
                 - `parent_configuration` (Union[str, Callable]): Configure grouping for this node label.
@@ -513,8 +513,8 @@ class Neo4jGraphWidget:
         if isinstance(widget, Neo4jGraphWidget):
             graph = widget._widget
         nodes, edges = graph.selection
-        element_ids = getattr(graph, '_neo4j_node_element_ids', {})
-        return [element_ids.get(node['id'], node['id']) for node in nodes]
+        element_ids = getattr(graph, "_neo4j_node_element_ids", {})
+        return [element_ids.get(node["id"], node["id"]) for node in nodes]
 
     def get_selected_relationship_ids(self, widget: Optional[Type["Neo4jGraphWidget"]] = None) -> List[Any | None]:
         """
@@ -531,8 +531,8 @@ class Neo4jGraphWidget:
         if isinstance(widget, Neo4jGraphWidget):
             graph = widget._widget
         nodes, edges = graph.selection
-        element_ids = getattr(graph, '_neo4j_relationship_element_ids', {})
-        return [element_ids.get(edge['id'], edge['id']) for edge in edges]
+        element_ids = getattr(graph, "_neo4j_relationship_element_ids", {})
+        return [element_ids.get(edge["id"], edge["id"]) for edge in edges]
 
     def get_node_cell_mapping(self) -> Union[str, Callable, None]:
         """
@@ -541,7 +541,7 @@ class Neo4jGraphWidget:
         Returns:
             Union[str, Callable, None]: The currently specified node cell mapping.
         """
-        return self._node_cell_mapping if hasattr(self, '_node_cell_mapping') else None
+        return self._node_cell_mapping if hasattr(self, "_node_cell_mapping") else None
 
     def set_node_cell_mapping(self, node_cell_mapping: Union[str, Callable]) -> None:
         """
@@ -564,7 +564,7 @@ class Neo4jGraphWidget:
         Returns:
              None
         """
-        if hasattr(self, '_node_cell_mapping'):
-            delattr(self, '_node_cell_mapping')
+        if hasattr(self, "_node_cell_mapping"):
+            delattr(self, "_node_cell_mapping")
 
     node_cell_mapping = property(get_node_cell_mapping, set_node_cell_mapping, del_node_cell_mapping)
