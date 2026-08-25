@@ -41,6 +41,16 @@ for a running example.
 The widget uses yFiles Graphs for Jupyter at its core, and therefore runs in any environment that is supported by it,
 see [supported environments](https://github.com/yWorks/yfiles-jupyter-graphs/tree/main?tab=readme-ov-file#supported-environments).
 
+## AI Coding Assistant
+
+Working with an AI coding agent? Our [agent guide](agent-guide.md) contains instructions and best practices for coding agents working with this Neo4j widget.
+
+**Example start prompt:**
+```text
+Read the instructions at https://raw.githubusercontent.com/yWorks/yfiles-jupyter-graphs-for-neo4j/refs/heads/main/agent-guide.md.
+Then, create a Jupyter notebook that connects to a Neo4j database and visualizes an insightful subset of the graph using `yfiles_jupyter_graphs_for_neo4j`.
+```
+
 ## Documentation
 
 The main class `Neo4jGraphWidget` provides the following API:
@@ -49,13 +59,13 @@ The main class `Neo4jGraphWidget` provides the following API:
 
 - `Neo4jGraphWidget`: Creates a new class instance with the following arguments
 
-| Argument           | Description                                                                                                                                                                                                                                        | Default   |
-|--------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
-| `driver`           | The neo4j `driver` that is used to execute Cypher queries.                                                                                                                                                                                         | `None`    |
-| `widget_layout`    | Can be used to specify general widget appearance through css attributes. See ipywidget's [`layout`](https://ipywidgets.readthedocs.io/en/stable/examples/Widget%20Layout.html#the-layout-attribute) for more information.                          | `None`    |
-| `overview_enabled` | Enable graph overview component. Default behaviour depends on cell width.                                                                                                                                                                          | `None`    |
-| `context_start_with` | Start with a specific side-panel opened in the interactive widget. Starts with closed side-panel by default.                                                                                                                                                                          | `None`    |
-| `layout`     | Can be used to specify a general default node and edge layout. Available algorithms are: "circular", "hierarchic", "organic", "interactive_organic", "orthogonal", "radial", "tree", "map", "orthogonal_edge_router", "organic_edge_router" | `organic` |
+| Argument             | Description                                                                                                                                                                                                                                 | Default   |
+|----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| `driver`             | The neo4j `driver` that is used to execute Cypher queries.                                                                                                                                                                                  | `None`    |
+| `widget_layout`      | Can be used to specify general widget appearance through css attributes. See ipywidget's [`layout`](https://ipywidgets.readthedocs.io/en/stable/examples/Widget%20Layout.html#the-layout-attribute) for more information.                   | `None`    |
+| `overview_enabled`   | Enable graph overview component. Default behaviour depends on cell width.                                                                                                                                                                   | `None`    |
+| `context_start_with` | Start with a specific side-panel opened in the interactive widget. Starts with closed side-panel by default.                                                                                                                                | `None`    |
+| `layout`             | Can be used to specify a general default node and edge layout. Available algorithms are: "circular", "hierarchic", "organic", "interactive_organic", "orthogonal", "radial", "tree", "map", "orthogonal_edge_router", "organic_edge_router" | `organic` |
 
 ### Methods 
 
